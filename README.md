@@ -1,8 +1,9 @@
-# XAI Stories — Curso 2025/26
+# XAI Stories 
 
 Libro colaborativo de casos de estudio en Inteligencia Artificial Explicable (XAI), creado por estudiantes de la asignatura de XAI.
+Curso 2025/26
 
-📖 **Libro online:** https://TU-USUARIO.github.io/xai-stories/
+📖 **Libro online:** https://belenda.github.io/xai-stories/
 
 ---
 
