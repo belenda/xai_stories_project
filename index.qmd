@@ -1,0 +1,14 @@
+# Prefacio {.unnumbered}
+
+![](images/cover.png){fig-align="center" width="60%"}
+
+Este libro es el resultado de los proyectos de los estudiantes de la asignatura de **Inteligencia Artificial Explicable (XAI)** durante el curso 2025/26. Cada equipo ha preparado un caso de estudio aplicando técnicas de XAI a problemas reales.
+
+El proyecto está inspirado en el libro [XAI Stories](https://pbiecek.github.io/xai_stories/) creado por Przemysław Biecek y estudiantes de la Universidad de Varsovia, así como en [Limitations of Interpretable Machine Learning Methods](https://compstat-lmu.github.io/iml_methods_limitations/) del Departamento de Estadística de la LMU Munich.
+
+Los capítulos están escritos en Markdown y Jupyter Notebooks. Las simulaciones, ejemplos y visualizaciones han sido creados con Python. El libro ha sido compilado con [Quarto](https://quarto.org/) y publicado en GitHub Pages.
+
+::: {.callout-note}
+## Licencia
+Este libro está licenciado bajo [Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License](http://creativecommons.org/licenses/by-nc-sa/4.0/).
+:::

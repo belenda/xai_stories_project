@@ -1,0 +1,73 @@
+# Ejemplo: Predicción de precios de vivienda {#sec-ejemplo}
+
+::: {.author-block}
+**Autores:** Nombre Apellido 1, Nombre Apellido 2
+
+**Dataset:** [Ames Housing](https://www.kaggle.com/datasets/prevek18/ames-housing-dataset) (Kaggle)
+
+**Técnicas XAI:** SHAP, PDP, Ceteris Paribus
+:::
+
+## Resumen
+
+Este capítulo es un **ejemplo de plantilla** para mostrar la estructura esperada. En un capítulo real, aquí iría un párrafo describiendo el problema abordado, el enfoque utilizado y las conclusiones principales.
+
+## Introducción
+
+Describir el contexto del problema: ¿por qué es relevante? ¿Qué se quiere predecir? ¿Por qué necesitamos explicaciones?
+
+## Datos
+
+```{python}
+#| echo: true
+#| eval: false
+
+import pandas as pd
+
+# Ejemplo: carga de datos
+# df = pd.read_csv("datos/ames_housing.csv")
+# df.head()
+```
+
+Describir el dataset: número de observaciones, variables más relevantes, preprocesamiento aplicado.
+
+## Modelo(s)
+
+```{python}
+#| echo: true
+#| eval: false
+
+# from sklearn.ensemble import GradientBoostingRegressor
+# model = GradientBoostingRegressor(n_estimators=500, max_depth=5)
+# model.fit(X_train, y_train)
+```
+
+Explicar qué modelos se han entrenado, por qué se han elegido y qué rendimiento tienen.
+
+## Explicaciones
+
+### Importancia de variables (SHAP)
+
+```{python}
+#| echo: true
+#| eval: false
+
+# import shap
+# explainer = shap.Explainer(model, X_train)
+# shap_values = explainer(X_test)
+# shap.summary_plot(shap_values, X_test)
+```
+
+Interpretar los resultados: ¿qué variables son más importantes? ¿Los resultados tienen sentido desde el punto de vista del dominio?
+
+### Explicaciones locales
+
+Analizar instancias individuales. ¿Por qué el modelo predice un precio alto/bajo para una vivienda concreta?
+
+## Conclusiones
+
+Resumir los hallazgos principales. ¿Qué hemos aprendido sobre el modelo gracias a XAI? ¿Qué limitaciones hemos encontrado?
+
+## Referencias
+
+Las referencias se gestionan automáticamente a través del archivo `references.bib`. Para citar, usar la sintaxis `[@ribeiro2016lime]`.

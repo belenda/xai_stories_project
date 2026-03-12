@@ -1,0 +1,50 @@
+project:
+  type: book
+  output-dir: docs
+
+book:
+  title: "XAI Stories"
+  subtitle: "Casos de Estudio en Inteligencia Artificial Explicable"
+  author: "Estudiantes de XAI — Curso 2025/26"
+  date: today
+  date-format: "YYYY"
+  repo-url: https://github.com/TU-USUARIO/xai-stories
+  repo-actions: [edit, issue]
+  sharing: [twitter, linkedin]
+  chapters:
+    - index.qmd
+    - foreword.qmd
+    - part: "Casos de Estudio"
+      chapters:
+        - chapters/01-ejemplo-placeholder.qmd
+        # Añadir aquí los capítulos de cada equipo:
+        # - chapters/02-nombre-capitulo.qmd
+        # - chapters/03-nombre-capitulo.qmd
+    - acknowledgements.qmd
+    - references.qmd
+
+bibliography: references.bib
+# csl: apa.csl  # Descomentar si se añade un archivo .csl personalizado
+
+format:
+  html:
+    theme:
+      light: cosmo
+      dark: darkly
+    css: styles.css
+    toc: true
+    toc-depth: 3
+    number-sections: true
+    code-fold: true
+    code-tools: true
+    code-link: true
+    highlight-style: github
+    fig-width: 8
+    fig-height: 5
+
+execute:
+  freeze: auto
+  warning: false
+  message: false
+
+lang: es
