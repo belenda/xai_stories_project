@@ -5,10 +5,10 @@ project:
 book:
   title: "XAI Stories"
   subtitle: "Casos de Estudio en Inteligencia Artificial Explicable"
-  author: "Estudiantes de XAI — Curso 2025/26"
+  author: "Estudiantes de XAI Curso 2025/26"
   date: today
   date-format: "YYYY"
-  repo-url: https://github.com/TU-USUARIO/xai-stories
+  repo-url: https://github.com/belenda/xai-stories
   repo-actions: [edit, issue]
   sharing: [twitter, linkedin]
   chapters:
@@ -16,7 +16,7 @@ book:
     - foreword.qmd
     - part: "Casos de Estudio"
       chapters:
-        - chapters/01-ejemplo-placeholder.qmd
+        - chapters/01-ejemplo.qmd
         # Añadir aquí los capítulos de cada equipo:
         # - chapters/02-nombre-capitulo.qmd
         # - chapters/03-nombre-capitulo.qmd
