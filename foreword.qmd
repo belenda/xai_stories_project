@@ -1,12 +1,8 @@
 # Prólogo {.unnumbered}
 
-## ¿Por qué?
-
 La creciente adopción de modelos de aprendizaje automático de tipo caja negra en dominios de alto impacto —salud, finanzas, justicia, educación— ha puesto de manifiesto la necesidad de comprender *por qué* un modelo toma una determinada decisión. Las técnicas de Inteligencia Artificial Explicable (XAI) permiten radiografiar estos modelos para obtener explicaciones a nivel local y global.
 
 Sin embargo, en la literatura abundan más las descripciones teóricas de métodos XAI que los ejemplos prácticos de su aplicación a problemas reales. Este libro pretende llenar ese hueco con casos de estudio concretos.
-
-## ¿Qué?
 
 Cada capítulo presenta un caso de estudio completo que sigue una estructura común:
 
@@ -15,8 +11,6 @@ Cada capítulo presenta un caso de estudio completo que sigue una estructura com
 3. **Modelo(s)**: entrenamiento y evaluación de uno o varios modelos.
 4. **Explicaciones**: aplicación de técnicas XAI para interpretar el modelo.
 5. **Conclusiones**: hallazgos principales y reflexiones.
-
-## ¿Cómo?
 
 Los estudiantes han trabajado en equipos, eligiendo libremente su tema y dataset. Cada equipo ha desarrollado su caso de estudio de forma autónoma, recibiendo feedback del profesorado a lo largo del proceso. Los capítulos han sido revisados para asegurar la calidad técnica y narrativa.
 

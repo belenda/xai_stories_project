@@ -3,61 +3,23 @@
 Libro colaborativo de casos de estudio en Inteligencia Artificial Explicable (XAI), creado por estudiantes de la asignatura de XAI.
 Curso 2025/26
 
-📖 **Libro online:** https://belenda.github.io/xai-stories/
+**Libro online:** https://belenda.github.io/xai-stories/
 
----
+**Quarto** (>= 1.4): https://quarto.org/docs/get-started/
+**Python** (>= 3.9) con Jupyter
 
-## Instrucciones para el profesor
-
-### Requisitos previos
-
-1. **Quarto** (>= 1.4): https://quarto.org/docs/get-started/
-2. **Python** (>= 3.9) con Jupyter
-3. **Git** y cuenta de GitHub
-
-### Configuración inicial (una sola vez)
-
-```bash
-# 1. Crear el repositorio en GitHub (puede ser público desde el inicio)
-#    Nombre sugerido: xai-stories
-
-# 2. Clonar este proyecto
-git clone https://github.com/TU-USUARIO/xai-stories.git
-cd xai-stories
-
-# 3. Instalar dependencias Python
-pip install -r requirements.txt
-
-# 4. Crear la imagen de portada
-#    Poner tu imagen de portada en images/cover.png
-#    (Se incluye un placeholder, sustitúyelo por una portada real)
-
-# 5. Editar _quarto.yml
-#    - Cambiar repo-url por la URL de tu repositorio
-#    - Cambiar author por tu nombre / nombre de la asignatura
-
-# 6. Editar index.qmd, foreword.qmd y acknowledgements.qmd
-#    - Personalizar con los datos de tu asignatura
-
-# 7. Compilar localmente para verificar
+# Compilar localmente para verificar
 quarto preview
-
-# 8. Subir a GitHub
 git add .
-git commit -m "Configuración inicial del libro XAI Stories"
+git commit -m "historia de XAI"
 git push origin main
 ```
-
 ### Activar GitHub Pages
-
 1. Ir a **Settings > Pages** en el repositorio de GitHub.
 2. En **Source**, seleccionar **GitHub Actions**.
 3. El workflow se ejecutará automáticamente con cada push a `main`.
 
 ### Añadir capítulos de estudiantes
-
-Cuando recibas los capítulos de los estudiantes:
-
 ```bash
 # 1. Copiar el archivo .qmd (o .ipynb) del equipo a chapters/
 cp entrega_equipo/capitulo.qmd chapters/02-nombre-descriptivo.qmd

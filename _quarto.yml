@@ -5,7 +5,7 @@ project:
 book:
   title: "XAI Stories"
   subtitle: "Casos de Estudio en Inteligencia Artificial Explicable"
-  author: "Estudiantes de XAI Curso 2025/26"
+  author: "Belén Díaz Agudo y los estudiantes de XAI Curso 2025/26 del máster en IA de la UCM"
   date: today
   date-format: "YYYY"
   repo-url: https://github.com/belenda/xai-stories
