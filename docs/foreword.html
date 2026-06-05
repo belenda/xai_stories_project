@@ -521,7 +521,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./acknowledgements.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Agradecimientos</span></span></a>
+ <span class="menu-text">Agradecimientos</span></a>
   </div>
 </li>
         <li class="sidebar-item">
@@ -535,8 +535,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </nav>
 <div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
-        
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Tabla de contenidos</h2>
+   
+  <ul>
+  <li><a href="#los-capítulos-de-este-libro-abordan-problemas-tan-diversos-como" id="toc-los-capítulos-de-este-libro-abordan-problemas-tan-diversos-como" class="nav-link active" data-scroll-target="#los-capítulos-de-este-libro-abordan-problemas-tan-diversos-como">Los capítulos de este libro abordan problemas tan diversos como</a></li>
+  <li><a href="#los-autores" id="toc-los-autores" class="nav-link" data-scroll-target="#los-autores">Los autores</a></li>
+  </ul>
+<div class="toc-actions"><ul><li><a href="https://github.com/belenda/xai_stories_project/edit/main/foreword.qmd" class="toc-action"><i class="bi bi-github"></i>Editar esta página</a></li><li><a href="https://github.com/belenda/xai_stories_project/issues/new" class="toc-action"><i class="bi empty"></i>Informar sobre problema</a></li></ul></div></nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
@@ -561,22 +568,109 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<p>La creciente adopción de modelos de aprendizaje automático de tipo caja negra en dominios de alto impacto —salud, finanzas, justicia, educación— ha puesto de manifiesto la necesidad de comprender <em>por qué</em> un modelo toma una determinada decisión. Las técnicas de Inteligencia Artificial Explicable (XAI) permiten radiografiar estos modelos para obtener explicaciones a nivel local y global.</p>
-<p>Sin embargo, en la literatura abundan más las descripciones teóricas de métodos XAI que los ejemplos prácticos de su aplicación a problemas reales. Este libro pretende llenar ese hueco con casos de estudio concretos.</p>
-<p>Cada capítulo presenta un caso de estudio completo que sigue una estructura común:</p>
-<ol type="1">
-<li><strong>Problema</strong>: descripción del problema predictivo y su contexto.</li>
-<li><strong>Datos</strong>: exploración y preparación del dataset.</li>
-<li><strong>Modelo(s)</strong>: entrenamiento y evaluación de uno o varios modelos.</li>
-<li><strong>Explicaciones</strong>: aplicación de técnicas XAI para interpretar el modelo.</li>
-<li><strong>Conclusiones</strong>: hallazgos principales y reflexiones.</li>
-</ol>
-<p>Los estudiantes han trabajado en equipos, eligiendo libremente su tema y dataset. Cada equipo ha desarrollado su caso de estudio de forma autónoma, recibiendo feedback del profesorado a lo largo del proceso. Los capítulos han sido revisados para asegurar la calidad técnica y narrativa.</p>
-<p>El código es reproducible y está disponible junto con cada capítulo.</p>
+<p><em>por Belén Díaz Agudo, profesora de la asignatura XAI, Facultad de Informática, UCM</em></p>
+<hr>
+<p>La creciente adopción de modelos de aprendizaje automático de tipo caja negra en dominios de alto impacto —salud, finanzas, justicia, educación— ha puesto de manifiesto la necesidad urgente de comprender <em>por qué</em> un modelo toma una determinada decisión. Las técnicas de Inteligencia Artificial Explicable (XAI) permiten radiografiar estos modelos y obtener explicaciones a nivel local y global, un requisito cada vez más exigido por marcos regulatorios como el AI Act europeo.</p>
+<p>Este libro recoge los trabajos finales de los estudiantes del Máster en IA de la UCM que cursaron la asignatura de XAI durante el curso 2025/26. Cada capítulo es un caso de estudio completo e independiente, desarrollado de forma autónoma por su equipo, que combina código reproducible con una narrativa clara orientada al lector.</p>
+<section id="los-capítulos-de-este-libro-abordan-problemas-tan-diversos-como" class="level3">
+<h3 class="anchored" data-anchor-id="los-capítulos-de-este-libro-abordan-problemas-tan-diversos-como">Los capítulos de este libro abordan problemas tan diversos como</h3>
+<ul>
+<li>La explicabilidad de redes neuronales profundas sobre imágenes médicas de resonancia magnética para la detección del Alzheimer.</li>
+<li>La auditoría de sesgos y atajos léxicos en detectores automáticos de lenguaje tóxico.</li>
+<li>El análisis de equidad en el sistema de admisión universitaria de la UCM.</li>
+<li>La explicabilidad de agentes de Reinforcement Learning mediante árboles de decisión.</li>
+<li>La clasificación de fases del sueño a partir de señales de dispositivos wearables.</li>
+<li>El diseño de un nuevo método de generación de vecindarios para LIME basado en algoritmos genéticos multiobjetivo.</li>
+<li>Y muchos más, que el lector encontrará en las páginas que siguen.</li>
+</ul>
+</section>
+<section id="los-autores" class="level3">
+<h3 class="anchored" data-anchor-id="los-autores">Los autores</h3>
+<p>Los capítulos de este libro han sido escritos por los siguientes estudiantes:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Capítulo</th>
+<th>Autores</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>LIME-GA</td>
+<td>Jorge Sánchez López-Varela</td>
+</tr>
+<tr class="even">
+<td>Ataques adversarios a LIME y SHAP</td>
+<td>Sandra Conde González y Pablo Folgueira Galán</td>
+</tr>
+<tr class="odd">
+<td>Alzheimer MRI</td>
+<td>Álvaro Ray Martínez y Pedro Antonio Martín Peláez</td>
+</tr>
+<tr class="even">
+<td>ECG y ResNet</td>
+<td>Hugo Martínez Bezanilla y Javier Vega Domínguez</td>
+</tr>
+<tr class="odd">
+<td>Reconocimiento facial de emociones</td>
+<td>Juan Broto Ortega y Lidia González Martínez</td>
+</tr>
+<tr class="even">
+<td>Series temporales en restaurantes</td>
+<td>Gianfranco Antonio Caschetto</td>
+</tr>
+<tr class="odd">
+<td>Explainable Reinforcement Learning</td>
+<td>Pedro León Miranda y Likang Wu</td>
+</tr>
+<tr class="even">
+<td>Admisión universitaria UCM</td>
+<td>Pablo Magno Pezo Ortiz y Zakariae Laktiouet Saidi</td>
+</tr>
+<tr class="odd">
+<td>Gestión de inversiones</td>
+<td>Stephan Eberhard Wolters Eisenhardt</td>
+</tr>
+<tr class="even">
+<td>Rotación laboral</td>
+<td>Juan Pablo Bolta Ballester</td>
+</tr>
+<tr class="odd">
+<td>Clasificación del sueño (wearables)</td>
+<td>Dennys Xavier Landy Rivera y Sergio Moragón Jiménez</td>
+</tr>
+<tr class="even">
+<td>Detección de lenguaje tóxico</td>
+<td>Haojie Yin y Qian Cheng</td>
+</tr>
+<tr class="odd">
+<td>Robustez de explicaciones en LLMs</td>
+<td>Isabel Tejedor Burón</td>
+</tr>
+<tr class="even">
+<td>Señales de tráfico con CNN</td>
+<td>Alejandra Llord Muñoz de la Espada y Carolina Romero Delgado</td>
+</tr>
+<tr class="odd">
+<td>CNN y ConvVAE para denoising</td>
+<td>Sergio Herreros Fernández</td>
+</tr>
+<tr class="even">
+<td>Dashboard XAI con agentes LLM</td>
+<td>María Sánchez Carrasco, David Rivera Martínez y Pablo Sánchez Martín</td>
+</tr>
+</tbody>
+</table>
+<p>El código de todos los capítulos es reproducible y está disponible en el <a href="https://github.com/belenda/xai_stories_project">repositorio de GitHub</a>.</p>
 
 
 <!-- -->
 
+</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
@@ -1057,25 +1151,52 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </nav><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Ejecutar el código</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu"># Prólogo {.unnumbered}</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>La creciente adopción de modelos de aprendizaje automático de tipo caja negra en dominios de alto impacto —salud, finanzas, justicia, educación— ha puesto de manifiesto la necesidad de comprender *por qué* un modelo toma una determinada decisión. Las técnicas de Inteligencia Artificial Explicable (XAI) permiten radiografiar estos modelos para obtener explicaciones a nivel local y global.</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>*por Belén Díaz Agudo, profesora de la asignatura XAI, Facultad de Informática, UCM*</span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>Sin embargo, en la literatura abundan más las descripciones teóricas de métodos XAI que los ejemplos prácticos de su aplicación a problemas reales. Este libro pretende llenar ese hueco con casos de estudio concretos.</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>---</span>
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>Cada capítulo presenta un caso de estudio completo que sigue una estructura común:</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>La creciente adopción de modelos de aprendizaje automático de tipo caja negra en dominios de alto impacto —salud, finanzas, justicia, educación— ha puesto de manifiesto la necesidad urgente de comprender *por qué* un modelo toma una determinada decisión. Las técnicas de Inteligencia Artificial Explicable (XAI) permiten radiografiar estos modelos y obtener explicaciones a nivel local y global, un requisito cada vez más exigido por marcos regulatorios como el AI Act europeo.</span>
 <span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>**Problema**: descripción del problema predictivo y su contexto.</span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>**Datos**: exploración y preparación del dataset.</span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>**Modelo(s)**: entrenamiento y evaluación de uno o varios modelos.</span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="ss">4. </span>**Explicaciones**: aplicación de técnicas XAI para interpretar el modelo.</span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="ss">5. </span>**Conclusiones**: hallazgos principales y reflexiones.</span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>Los estudiantes han trabajado en equipos, eligiendo libremente su tema y dataset. Cada equipo ha desarrollado su caso de estudio de forma autónoma, recibiendo feedback del profesorado a lo largo del proceso. Los capítulos han sido revisados para asegurar la calidad técnica y narrativa.</span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>El código es reproducible y está disponible junto con cada capítulo.</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>Este libro recoge los trabajos finales de los estudiantes del Máster en IA de la UCM que cursaron la asignatura de XAI durante el curso 2025/26. Cada capítulo es un caso de estudio completo e independiente, desarrollado de forma autónoma por su equipo, que combina código reproducible con una narrativa clara orientada al lector.</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="fu">### Los capítulos de este libro abordan problemas tan diversos como</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>La explicabilidad de redes neuronales profundas sobre imágenes médicas de resonancia magnética para la detección del Alzheimer.</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>La auditoría de sesgos y atajos léxicos en detectores automáticos de lenguaje tóxico.</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>El análisis de equidad en el sistema de admisión universitaria de la UCM.</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>La explicabilidad de agentes de Reinforcement Learning mediante árboles de decisión.</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>La clasificación de fases del sueño a partir de señales de dispositivos wearables.</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>El diseño de un nuevo método de generación de vecindarios para LIME basado en algoritmos genéticos multiobjetivo.</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Y muchos más, que el lector encontrará en las páginas que siguen.</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="fu">### Los autores</span></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>Los capítulos de este libro han sido escritos por los siguientes estudiantes:</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Capítulo <span class="pp">|</span> Autores <span class="pp">|</span></span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|</span></span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> LIME-GA <span class="pp">|</span> Jorge Sánchez López-Varela <span class="pp">|</span></span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Ataques adversarios a LIME y SHAP <span class="pp">|</span> Sandra Conde González y Pablo Folgueira Galán <span class="pp">|</span></span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Alzheimer MRI <span class="pp">|</span> Álvaro Ray Martínez y Pedro Antonio Martín Peláez <span class="pp">|</span></span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> ECG y ResNet <span class="pp">|</span> Hugo Martínez Bezanilla y Javier Vega Domínguez <span class="pp">|</span></span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Reconocimiento facial de emociones <span class="pp">|</span> Juan Broto Ortega y Lidia González Martínez <span class="pp">|</span></span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Series temporales en restaurantes <span class="pp">|</span> Gianfranco Antonio Caschetto <span class="pp">|</span></span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Explainable Reinforcement Learning <span class="pp">|</span> Pedro León Miranda y Likang Wu <span class="pp">|</span></span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Admisión universitaria UCM <span class="pp">|</span> Pablo Magno Pezo Ortiz y Zakariae Laktiouet Saidi <span class="pp">|</span></span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Gestión de inversiones <span class="pp">|</span> Stephan Eberhard Wolters Eisenhardt <span class="pp">|</span></span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Rotación laboral <span class="pp">|</span> Juan Pablo Bolta Ballester <span class="pp">|</span></span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Clasificación del sueño (wearables) <span class="pp">|</span> Dennys Xavier Landy Rivera y Sergio Moragón Jiménez <span class="pp">|</span></span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Detección de lenguaje tóxico <span class="pp">|</span> Haojie Yin y Qian Cheng <span class="pp">|</span></span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Robustez de explicaciones en LLMs <span class="pp">|</span> Isabel Tejedor Burón <span class="pp">|</span></span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Señales de tráfico con CNN <span class="pp">|</span> Alejandra Llord Muñoz de la Espada y Carolina Romero Delgado <span class="pp">|</span></span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> CNN y ConvVAE para denoising <span class="pp">|</span> Sergio Herreros Fernández <span class="pp">|</span></span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Dashboard XAI con agentes LLM <span class="pp">|</span> María Sánchez Carrasco, David Rivera Martínez y Pablo Sánchez Martín <span class="pp">|</span></span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a>El código de todos los capítulos es reproducible y está disponible en el <span class="co">[</span><span class="ot">repositorio de GitHub</span><span class="co">](https://github.com/belenda/xai_stories_project)</span>.</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
 </div></div></div></div></div>
 </div> <!-- /content -->
 
 
 
 
-<footer class="footer"><div class="nav-footer"><div class="nav-footer-center"><div class="toc-actions"><ul><li><a href="https://github.com/belenda/xai_stories_project/edit/main/foreword.qmd" class="toc-action"><i class="bi bi-github"></i>Editar esta página</a></li><li><a href="https://github.com/belenda/xai_stories_project/issues/new" class="toc-action"><i class="bi empty"></i>Informar sobre problema</a></li></ul></div></div></div></footer></body></html>
+<footer class="footer"><div class="nav-footer"><div class="nav-footer-center"><div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/belenda/xai_stories_project/edit/main/foreword.qmd" class="toc-action"><i class="bi bi-github"></i>Editar esta página</a></li><li><a href="https://github.com/belenda/xai_stories_project/issues/new" class="toc-action"><i class="bi empty"></i>Informar sobre problema</a></li></ul></div></div></div></footer></body></html>

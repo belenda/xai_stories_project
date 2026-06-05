@@ -1,17 +1,44 @@
 # Prólogo {.unnumbered}
 
-La creciente adopción de modelos de aprendizaje automático de tipo caja negra en dominios de alto impacto —salud, finanzas, justicia, educación— ha puesto de manifiesto la necesidad de comprender *por qué* un modelo toma una determinada decisión. Las técnicas de Inteligencia Artificial Explicable (XAI) permiten radiografiar estos modelos para obtener explicaciones a nivel local y global.
+*por Belén Díaz Agudo, profesora de la asignatura XAI, Facultad de Informática, UCM*
 
-Sin embargo, en la literatura abundan más las descripciones teóricas de métodos XAI que los ejemplos prácticos de su aplicación a problemas reales. Este libro pretende llenar ese hueco con casos de estudio concretos.
+---
 
-Cada capítulo presenta un caso de estudio completo que sigue una estructura común:
+La creciente adopción de modelos de aprendizaje automático de tipo caja negra en dominios de alto impacto —salud, finanzas, justicia, educación— ha puesto de manifiesto la necesidad urgente de comprender *por qué* un modelo toma una determinada decisión. Las técnicas de Inteligencia Artificial Explicable (XAI) permiten radiografiar estos modelos y obtener explicaciones a nivel local y global, un requisito cada vez más exigido por marcos regulatorios como el AI Act europeo.
 
-1. **Problema**: descripción del problema predictivo y su contexto.
-2. **Datos**: exploración y preparación del dataset.
-3. **Modelo(s)**: entrenamiento y evaluación de uno o varios modelos.
-4. **Explicaciones**: aplicación de técnicas XAI para interpretar el modelo.
-5. **Conclusiones**: hallazgos principales y reflexiones.
+Este libro recoge los trabajos finales de los estudiantes del Máster en IA de la UCM que cursaron la asignatura de XAI durante el curso 2025/26. Cada capítulo es un caso de estudio completo e independiente, desarrollado de forma autónoma por su equipo, que combina código reproducible con una narrativa clara orientada al lector.
 
-Los estudiantes han trabajado en equipos, eligiendo libremente su tema y dataset. Cada equipo ha desarrollado su caso de estudio de forma autónoma, recibiendo feedback del profesorado a lo largo del proceso. Los capítulos han sido revisados para asegurar la calidad técnica y narrativa.
+### Los capítulos de este libro abordan problemas tan diversos como
 
-El código es reproducible y está disponible junto con cada capítulo.
+- La explicabilidad de redes neuronales profundas sobre imágenes médicas de resonancia magnética para la detección del Alzheimer.
+- La auditoría de sesgos y atajos léxicos en detectores automáticos de lenguaje tóxico.
+- El análisis de equidad en el sistema de admisión universitaria de la UCM.
+- La explicabilidad de agentes de Reinforcement Learning mediante árboles de decisión.
+- La clasificación de fases del sueño a partir de señales de dispositivos wearables.
+- El diseño de un nuevo método de generación de vecindarios para LIME basado en algoritmos genéticos multiobjetivo.
+- Y muchos más, que el lector encontrará en las páginas que siguen.
+
+### Los autores
+
+Los capítulos de este libro han sido escritos por los siguientes estudiantes:
+
+| Capítulo | Autores |
+|---|---|
+| LIME-GA | Jorge Sánchez López-Varela |
+| Ataques adversarios a LIME y SHAP | Sandra Conde González y Pablo Folgueira Galán |
+| Alzheimer MRI | Álvaro Ray Martínez y Pedro Antonio Martín Peláez |
+| ECG y ResNet | Hugo Martínez Bezanilla y Javier Vega Domínguez |
+| Reconocimiento facial de emociones | Juan Broto Ortega y Lidia González Martínez |
+| Series temporales en restaurantes | Gianfranco Antonio Caschetto |
+| Explainable Reinforcement Learning | Pedro León Miranda y Likang Wu |
+| Admisión universitaria UCM | Pablo Magno Pezo Ortiz y Zakariae Laktiouet Saidi |
+| Gestión de inversiones | Stephan Eberhard Wolters Eisenhardt |
+| Rotación laboral | Juan Pablo Bolta Ballester |
+| Clasificación del sueño (wearables) | Dennys Xavier Landy Rivera y Sergio Moragón Jiménez |
+| Detección de lenguaje tóxico | Haojie Yin y Qian Cheng |
+| Robustez de explicaciones en LLMs | Isabel Tejedor Burón |
+| Señales de tráfico con CNN | Alejandra Llord Muñoz de la Espada y Carolina Romero Delgado |
+| CNN y ConvVAE para denoising | Sergio Herreros Fernández |
+| Dashboard XAI con agentes LLM | María Sánchez Carrasco, David Rivera Martínez y Pablo Sánchez Martín |
+
+El código de todos los capítulos es reproducible y está disponible en el [repositorio de GitHub](https://github.com/belenda/xai_stories_project).

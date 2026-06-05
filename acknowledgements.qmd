@@ -1,13 +1,15 @@
-# Agradecimientos 
+# Agradecimientos {.unnumbered}
 
-Este libro no habría sido posible sin el esfuerzo y la dedicación de todos los estudiantes que han participado en el proyecto. Cada equipo ha invertido tiempo y creatividad en desarrollar su caso de estudio, y el resultado colectivo es mayor que la suma de sus partes.
+Este libro no habría sido posible sin el esfuerzo, la curiosidad y la dedicación de los dieciséis equipos de estudiantes que participaron en el proyecto durante el curso 2025/26. Cada uno eligió libremente su tema, exploró los datos, entrenó sus modelos y escribió su historia de XAI. El resultado colectivo es mayor que la suma de sus partes.
 
-Agradecemos especialmente a:
+Gracias a todos los autores de este libro:
 
-- **Los estudiantes** de la asignatura de XAI del curso 2025/26, autores de los capítulos que componen este libro.
-- **Belén Díaz Agudo por la coordinación, supervisión y revisión de los trabajos.
-- **Facultad de Informática de la UCM y al Máster en IA**, por proporcionar el marco académico para este proyecto.
+**Álvaro Ray Martínez · Pedro Antonio Martín Peláez · Hugo Martínez Bezanilla · Javier Vega Domínguez · Juan Broto Ortega · Lidia González Martínez · Sandra Conde González · Pablo Folgueira Galán · Haojie Yin · Qian Cheng · Alejandra Llord Muñoz de la Espada · Carolina Romero Delgado · Dennys Xavier Landy Rivera · Sergio Moragón Jiménez · Gianfranco Antonio Caschetto · Stephan Eberhard Wolters Eisenhardt · Pablo Magno Pezo Ortiz · Zakariae Laktiouet Saidi · Juan Pablo Bolta Ballester · Sergio Herreros Fernández · Isabel Tejedor Burón · Pedro León Miranda · Likang Wu · María Sánchez Carrasco · David Rivera Martínez · Pablo Sánchez Martín · Jorge Sánchez López-Varela**
 
-Este proyecto está inspirado en el trabajo de **Przemysław Biecek** y sus estudiantes en la Universidad de Varsovia, cuyo libro [XAI Stories](https://pbiecek.github.io/xai_stories/) sirvió como modelo e inspiración directa.
+---
 
-Gracias también a los desarrolladores de las herramientas de código abierto que han hecho posible este trabajo: Python, scikit-learn, SHAP, LIME, Quarto, y muchas otras.
+Este proyecto está inspirado en el trabajo de **Przemysław Biecek** y sus estudiantes en la Universidad de Varsovia, cuyo libro [XAI Stories](https://pbiecek.github.io/xai_stories/) sirvió como modelo e inspiración directa, y en [Limitations of Interpretable Machine Learning Methods](https://compstat-lmu.github.io/iml_methods_limitations/) del Departamento de Estadística de la LMU Munich.
+
+Gracias también a los desarrolladores de las herramientas de código abierto que han hecho posible este trabajo: Python, scikit-learn, SHAP, LIME, Captum, TensorFlow, PyTorch, Quarto y muchas otras librerías del ecosistema de IA explicable.
+
+Este libro ha sido coordinado y supervisado por **Belén Díaz Agudo**, profesora de la asignatura de Técnicas de Inteligencia Artificial Explicable del Máster en Inteligencia Artificial de la Facultad de Informática de la Universidad Complutense de Madrid.

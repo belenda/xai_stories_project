@@ -1,12 +1,20 @@
 # Prefacio {.unnumbered}
 
-![](images/cover.png){fig-align="center" width="60%"}
+## Historias de XAI del Máster en Inteligencia Artificial, UCM
 
-Este libro es el resultado de los proyectos de los estudiantes de la asignatura de **Inteligencia Artificial Explicable (XAI)** durante el curso 2025/26. Cada equipo ha preparado un caso de estudio aplicando técnicas de XAI a problemas reales.
+Este libro es el resultado de los proyectos finales de la asignatura **Técnicas de Inteligencia Artificial Explicable (XAI)**, impartida por la profesora **Belén Díaz Agudo** en el **Máster Universitario en Inteligencia Artificial** de la **Facultad de Informática de la Universidad Complutense de Madrid**, durante el curso 2025/26.
 
-El proyecto está inspirado en el libro [XAI Stories](https://pbiecek.github.io/xai_stories/) creado por Przemysław Biecek y estudiantes de la Universidad de Varsovia, así como en [Limitations of Interpretable Machine Learning Methods](https://compstat-lmu.github.io/iml_methods_limitations/) del Departamento de Estadística de la LMU Munich.
+### Sobre el Máster
 
-Los capítulos están escritos en Markdown y Jupyter Notebooks. Las simulaciones, ejemplos y visualizaciones han sido creados con Python. El libro ha sido compilado con [Quarto](https://quarto.org/) y publicado en GitHub Pages.
+El [Máster Universitario en Inteligencia Artificial de la UCM](https://informatica.ucm.es/master-en-inteligencia-artificial) es un programa oficial de posgrado orientado a la formación de especialistas en IA con una sólida base teórica y práctica. La asignatura de XAI aborda los fundamentos y las técnicas más relevantes para hacer los modelos de aprendizaje automático interpretables y transparentes, una competencia cada vez más exigida en entornos regulados como la sanidad, las finanzas o la justicia.
+
+### Sobre este libro
+
+Cada capítulo ha sido desarrollado por un equipo de estudiantes que ha elegido libremente su problema, dataset y enfoque XAI. El resultado es una colección de casos de estudio reales que cubre una amplia variedad de dominios y técnicas: desde imagen médica y señales fisiológicas hasta texto, series temporales y datos tabulares.
+
+El proyecto está inspirado en el libro [XAI Stories](https://pbiecek.github.io/xai_stories/) de Przemysław Biecek y sus estudiantes de la Universidad de Varsovia, y en [Limitations of Interpretable Machine Learning Methods](https://compstat-lmu.github.io/iml_methods_limitations/) de la LMU Munich.
+
+Los capítulos están escritos en Jupyter Notebooks con narrativa en Markdown.  El libro ha sido compilado con [Quarto](https://quarto.org/) y publicado en GitHub Pages.
 
 ::: {.callout-note}
 ## Licencia
