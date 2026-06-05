@@ -1,6 +1,6 @@
 # Prefacio {.unnumbered}
 
-![](images/cover.png){fig-align="center" width="70%"}
+![](images/cover.png){fig-align="center" width="100%"}
 
 ## Historias de XAI del Máster en Inteligencia Artificial, UCM
 
