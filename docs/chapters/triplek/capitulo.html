@@ -1,0 +1,1757 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="es" xml:lang="es"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.38">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>6&nbsp; Clasificación y explicabilidad temporal de la demanda en restaurantes con TSInterpret – XAI Stories</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<link href="../../chapters/xrl/capitulo.html" rel="next">
+<link href="../../chapters/emociones/capitulo.html" rel="prev">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-de63f62b328812d8e578a4d74e282472.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-dark-6b6957c917596b414ec0b78690761e87.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-de63f62b328812d8e578a4d74e282472.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-81de787dd4773dbc0001c2dc1cc3016d.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-dark-21613c26995e5ad49e067cca7f3a46fb.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../../site_libs/bootstrap/bootstrap-81de787dd4773dbc0001c2dc1cc3016d.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No se han encontrado resultados",
+    "search-matching-documents-text": "documentos encontrados",
+    "search-copy-link-title": "Copiar el enlace en la búsqueda",
+    "search-hide-matches-text": "Ocultar resultados adicionales",
+    "search-more-match-text": "resultado adicional en este documento",
+    "search-more-matches-text": "resultados adicionales en este documento",
+    "search-clear-button-title": "Borrar",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancelar",
+    "search-submit-button-title": "Enviar",
+    "search-label": "Buscar"
+  }
+}</script>
+
+
+<link rel="stylesheet" href="../../styles.css">
+</head>
+
+<body class="nav-sidebar floating quarto-light"><script id="quarto-html-before-body" type="application/javascript">
+    const toggleBodyColorMode = (bsSheetEl) => {
+      const mode = bsSheetEl.getAttribute("data-mode");
+      const bodyEl = window.document.querySelector("body");
+      if (mode === "dark") {
+        bodyEl.classList.add("quarto-dark");
+        bodyEl.classList.remove("quarto-light");
+      } else {
+        bodyEl.classList.add("quarto-light");
+        bodyEl.classList.remove("quarto-dark");
+      }
+    }
+    const toggleBodyColorPrimary = () => {
+      const bsSheetEl = window.document.querySelector("link#quarto-bootstrap:not([rel=disabled-stylesheet])");
+      if (bsSheetEl) {
+        toggleBodyColorMode(bsSheetEl);
+      }
+    }
+    const setColorSchemeToggle = (alternate) => {
+      const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+      for (let i=0; i < toggles.length; i++) {
+        const toggle = toggles[i];
+        if (toggle) {
+          if (alternate) {
+            toggle.classList.add("alternate");
+          } else {
+            toggle.classList.remove("alternate");
+          }
+        }
+      }
+    };
+    const toggleColorMode = (alternate) => {
+      // Switch the stylesheets
+      const primaryStylesheets = window.document.querySelectorAll('link.quarto-color-scheme:not(.quarto-color-alternate)');
+      const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+      manageTransitions('#quarto-margin-sidebar .nav-link', false);
+      if (alternate) {
+        // note: dark is layered on light, we don't disable primary!
+        enableStylesheet(alternateStylesheets);
+        for (const sheetNode of alternateStylesheets) {
+          if (sheetNode.id === "quarto-bootstrap") {
+            toggleBodyColorMode(sheetNode);
+          }
+        }
+      } else {
+        disableStylesheet(alternateStylesheets);
+        enableStylesheet(primaryStylesheets)
+        toggleBodyColorPrimary();
+      }
+      manageTransitions('#quarto-margin-sidebar .nav-link', true);
+      // Switch the toggles
+      setColorSchemeToggle(alternate)
+      // Hack to workaround the fact that safari doesn't
+      // properly recolor the scrollbar when toggling (#1455)
+      if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+        manageTransitions("body", false);
+        window.scrollTo(0, 1);
+        setTimeout(() => {
+          window.scrollTo(0, 0);
+          manageTransitions("body", true);
+        }, 40);
+      }
+    }
+    const disableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        stylesheet.rel = 'disabled-stylesheet';
+      }
+    }
+    const enableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        if(stylesheet.rel !== 'stylesheet') { // for Chrome, which will still FOUC without this check
+          stylesheet.rel = 'stylesheet';
+        }
+      }
+    }
+    const manageTransitions = (selector, allowTransitions) => {
+      const els = window.document.querySelectorAll(selector);
+      for (let i=0; i < els.length; i++) {
+        const el = els[i];
+        if (allowTransitions) {
+          el.classList.remove('notransition');
+        } else {
+          el.classList.add('notransition');
+        }
+      }
+    }
+    const isFileUrl = () => {
+      return window.location.protocol === 'file:';
+    }
+    const hasAlternateSentinel = () => {
+      let styleSentinel = getColorSchemeSentinel();
+      if (styleSentinel !== null) {
+        return styleSentinel === "alternate";
+      } else {
+        return false;
+      }
+    }
+    const setStyleSentinel = (alternate) => {
+      const value = alternate ? "alternate" : "default";
+      if (!isFileUrl()) {
+        window.localStorage.setItem("quarto-color-scheme", value);
+      } else {
+        localAlternateSentinel = value;
+      }
+    }
+    const getColorSchemeSentinel = () => {
+      if (!isFileUrl()) {
+        const storageValue = window.localStorage.getItem("quarto-color-scheme");
+        return storageValue != null ? storageValue : localAlternateSentinel;
+      } else {
+        return localAlternateSentinel;
+      }
+    }
+    const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+      const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+      const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+      let newTheme = '';
+      if(authorPrefersDark) {
+        newTheme = isAlternate ? baseTheme : alternateTheme;
+      } else {
+        newTheme = isAlternate ? alternateTheme : baseTheme;
+      }
+      const changeGiscusTheme = () => {
+        // From: https://github.com/giscus/giscus/issues/336
+        const sendMessage = (message) => {
+          const iframe = document.querySelector('iframe.giscus-frame');
+          if (!iframe) return;
+          iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+        }
+        sendMessage({
+          setConfig: {
+            theme: newTheme
+          }
+        });
+      }
+      const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+      if (isGiscussLoaded) {
+        changeGiscusTheme();
+      }
+    };
+    const authorPrefersDark = false;
+    const darkModeDefault = authorPrefersDark;
+      document.querySelector('link#quarto-text-highlighting-styles.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+      document.querySelector('link#quarto-bootstrap.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+    let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+    // Dark / light mode switch
+    window.quartoToggleColorScheme = () => {
+      // Read the current dark / light value
+      let toAlternate = !hasAlternateSentinel();
+      toggleColorMode(toAlternate);
+      setStyleSentinel(toAlternate);
+      toggleGiscusIfUsed(toAlternate, darkModeDefault);
+      window.dispatchEvent(new Event('resize'));
+    };
+    // Switch to dark mode if need be
+    if (hasAlternateSentinel()) {
+      toggleColorMode(true);
+    } else {
+      toggleColorMode(false);
+    }
+  </script>
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Alternar barra lateral" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../chapters/triplek/capitulo.html">Series temporales</a></li><li class="breadcrumb-item"><a href="../../chapters/triplek/capitulo.html"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Clasificación y explicabilidad temporal de la demanda en restaurantes con TSInterpret</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Alternar barra lateral" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Buscar" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../../">XAI Stories</a> 
+        <div class="sidebar-tools-main tools-wide">
+    <a href="https://github.com/belenda/xai_stories_project" title="Ejecutar el código" class="quarto-navigation-tool px-1" aria-label="Ejecutar el código"><i class="bi bi-github"></i></a>
+    <div class="dropdown">
+      <a href="" title="Compartir" id="quarto-navigation-tool-dropdown-0" class="quarto-navigation-tool dropdown-toggle px-1" data-bs-toggle="dropdown" aria-expanded="false" role="link" aria-label="Compartir"><i class="bi bi-share"></i></a>
+      <ul class="dropdown-menu" aria-labelledby="quarto-navigation-tool-dropdown-0">
+          <li>
+            <a class="dropdown-item sidebar-tools-main-item" href="https://twitter.com/intent/tweet?url=|url|">
+              <i class="bi bi-twitter pe-1"></i>
+            Twitter
+            </a>
+          </li>
+          <li>
+            <a class="dropdown-item sidebar-tools-main-item" href="https://www.linkedin.com/sharing/share-offsite/?url=|url|">
+              <i class="bi bi-linkedin pe-1"></i>
+            LinkedIn
+            </a>
+          </li>
+      </ul>
+    </div>
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Alternar modo oscuro"><i class="bi"></i></a>
+</div>
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Buscar"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Prefacio</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../foreword.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Prólogo</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Nuevos métodos y propuestas</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/lime_ga/capitulo.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">LIME-GA: Generación de vecindarios realistas y diversos para LIME mediante un algoritmo genético multiobjetivo</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/adversarios_lime_shap/capitulo.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Explorando las limitaciones de métodos de explicabilidad LIME y SHAP</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Imagen médica y señales</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/alzheimer/capitulo.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Explicabilidad sobre EfficientNet3D binario (CN vs AD)</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/ecg/capitulo.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">¿Sabe el modelo dónde mirar?</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/emociones/capitulo.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Explicabilidad de un modelo de reconocimiento facial de emociones</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">Series temporales</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/triplek/capitulo.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Clasificación y explicabilidad temporal de la demanda en restaurantes con TSInterpret</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/xrl/capitulo.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Título. Explicabilidad de DRL basada en árboles</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true">
+ <span class="menu-text">Datos tabulares</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/admision_ucm/capitulo.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">¿A quién favorece la nota de acceso? Equidad y explicabilidad en el sistema de admisión universitaria.</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/inversiones/capitulo.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Explainable AI (XAI) aplicada a un problema principal-agente en gestión de inversiones</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/rotacion_laboral/capitulo.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Explicabilidad con LIME y SHAP en la predicción de rotación laboral</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/sueno/capitulo.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title"><strong>Identificación y clasificación de las etapas del sueño mediante dispositivos wearables</strong></span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true">
+ <span class="menu-text">Texto e IA generativa</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/toxicidad/capitulo.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">¿Podemos confiar en las explicaciones de los detectores de lenguaje tóxico?</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/tejedor/capitulo.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Evaluación de la robustez de explicaciones en LLMs mediante perturbaciones narrativas</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true">
+ <span class="menu-text">Visión por computador</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/senales_trafico/capitulo.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Explicabilidad de redes neuronales para señales de tráfico</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/cnn_vae/capitulo.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">1. Introducción y preprocesamiento de datos</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" role="navigation" aria-expanded="true">
+ <span class="menu-text">Sistemas e interfaces</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" role="navigation" aria-expanded="true" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-7" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/dashboard/capitulo.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Explicación y exploración de Datasets mediante lenguaje natural y técnicas de Inteligencia Artificial Explicable</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../acknowledgements.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Agradecimientos</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../references.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Referencias</span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Tabla de contenidos</h2>
+   
+  <ul>
+  <li><a href="#autores" id="toc-autores" class="nav-link active" data-scroll-target="#autores"><span class="header-section-number">6.1</span> Autores</a></li>
+  <li><a href="#resumen" id="toc-resumen" class="nav-link" data-scroll-target="#resumen"><span class="header-section-number">6.2</span> Resumen</a></li>
+  <li><a href="#introducción" id="toc-introducción" class="nav-link" data-scroll-target="#introducción"><span class="header-section-number">6.3</span> 1. Introducción</a>
+  <ul class="collapse">
+  <li><a href="#explicar-series-temporales" id="toc-explicar-series-temporales" class="nav-link" data-scroll-target="#explicar-series-temporales"><span class="header-section-number">6.3.1</span> Explicar series temporales</a></li>
+  <li><a href="#clasificación-de-demanda" id="toc-clasificación-de-demanda" class="nav-link" data-scroll-target="#clasificación-de-demanda"><span class="header-section-number">6.3.2</span> Clasificación de demanda</a></li>
+  <li><a href="#datos" id="toc-datos" class="nav-link" data-scroll-target="#datos"><span class="header-section-number">6.3.3</span> Datos</a></li>
+  </ul></li>
+  <li><a href="#datos-1" id="toc-datos-1" class="nav-link" data-scroll-target="#datos-1"><span class="header-section-number">6.4</span> 2. Datos</a>
+  <ul class="collapse">
+  <li><a href="#pedidos" id="toc-pedidos" class="nav-link" data-scroll-target="#pedidos"><span class="header-section-number">6.4.1</span> Pedidos</a></li>
+  <li><a href="#anonimización" id="toc-anonimización" class="nav-link" data-scroll-target="#anonimización"><span class="header-section-number">6.4.2</span> Anonimización</a></li>
+  <li><a href="#exploración-serie-diaria-y-día-de-la-semana" id="toc-exploración-serie-diaria-y-día-de-la-semana" class="nav-link" data-scroll-target="#exploración-serie-diaria-y-día-de-la-semana"><span class="header-section-number">6.4.3</span> Exploración: serie diaria y día de la semana</a></li>
+  </ul></li>
+  <li><a href="#serie-de-demanda-diaria" id="toc-serie-de-demanda-diaria" class="nav-link" data-scroll-target="#serie-de-demanda-diaria"><span class="header-section-number">6.5</span> 3. Serie de demanda diaria</a></li>
+  <li><a href="#ventanas-y-etiquetas" id="toc-ventanas-y-etiquetas" class="nav-link" data-scroll-target="#ventanas-y-etiquetas"><span class="header-section-number">6.6</span> 4. Ventanas y etiquetas</a></li>
+  <li><a href="#modelo" id="toc-modelo" class="nav-link" data-scroll-target="#modelo"><span class="header-section-number">6.7</span> 5. Modelo</a></li>
+  <li><a href="#explicaciones-con-tsinterpret" id="toc-explicaciones-con-tsinterpret" class="nav-link" data-scroll-target="#explicaciones-con-tsinterpret"><span class="header-section-number">6.8</span> 6. Explicaciones con TSInterpret</a>
+  <ul class="collapse">
+  <li><a href="#leftist" id="toc-leftist" class="nav-link" data-scroll-target="#leftist"><span class="header-section-number">6.8.1</span> 6.1 LEFTIST</a></li>
+  <li><a href="#casos-locales" id="toc-casos-locales" class="nav-link" data-scroll-target="#casos-locales"><span class="header-section-number">6.8.2</span> 6.1.1 Casos locales</a></li>
+  <li><a href="#importancia-agregada" id="toc-importancia-agregada" class="nav-link" data-scroll-target="#importancia-agregada"><span class="header-section-number">6.8.3</span> 6.2 Importancia agregada</a></li>
+  <li><a href="#contrafactuales-nun-cf" id="toc-contrafactuales-nun-cf" class="nav-link" data-scroll-target="#contrafactuales-nun-cf"><span class="header-section-number">6.8.4</span> 6.3 Contrafactuales NUN-CF</a></li>
+  <li><a href="#síntesis" id="toc-síntesis" class="nav-link" data-scroll-target="#síntesis"><span class="header-section-number">6.8.5</span> 6.4 Síntesis</a></li>
+  </ul></li>
+  <li><a href="#conclusiones" id="toc-conclusiones" class="nav-link" data-scroll-target="#conclusiones"><span class="header-section-number">6.9</span> 7. Conclusiones</a></li>
+  <li><a href="#referencias" id="toc-referencias" class="nav-link" data-scroll-target="#referencias"><span class="header-section-number">6.10</span> 8. Referencias</a></li>
+  </ul>
+<div class="toc-actions"><ul><li><a href="https://github.dev/belenda/xai_stories_project/blob/main/chapters/triplek/capitulo.ipynb" class="toc-action"><i class="bi bi-github"></i>Editar esta página</a></li><li><a href="https://github.com/belenda/xai_stories_project/issues/new" class="toc-action"><i class="bi empty"></i>Informar sobre problema</a></li></ul></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../chapters/triplek/capitulo.html">Series temporales</a></li><li class="breadcrumb-item"><a href="../../chapters/triplek/capitulo.html"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Clasificación y explicabilidad temporal de la demanda en restaurantes con TSInterpret</span></a></li></ol></nav>
+<div class="quarto-title">
+<div class="quarto-title-block"><div><h1 class="title"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Clasificación y explicabilidad temporal de la demanda en restaurantes con TSInterpret</span></h1><button type="button" class="btn code-tools-button dropdown-toggle" id="quarto-code-tools-menu" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi"></i> Código</button><ul class="dropdown-menu dropdown-menu-end" aria-labelelledby="quarto-code-tools-menu"><li><a id="quarto-show-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Mostrar todo el código</a></li><li><a id="quarto-hide-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Ocultar todo el código</a></li></ul></div></div>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="autores" class="level2" data-number="6.1">
+<h2 data-number="6.1" class="anchored" data-anchor-id="autores"><span class="header-section-number">6.1</span> Autores</h2>
+<p>Gianfranco Caschetto — Máster en Inteligencia Artificial, UCM (2025/26)</p>
+</section>
+<section id="resumen" class="level2" data-number="6.2">
+<h2 data-number="6.2" class="anchored" data-anchor-id="resumen"><span class="header-section-number">6.2</span> Resumen</h2>
+<p>Este capítulo usa TSInterpret para explicar un clasificador de demanda diaria en Triplek, una cadena de comida rápida en Venezuela. Con ventanas de 14 días de pedidos, el modelo predice si el día siguiente será de alta demanda o normal. El histórico real del CSV cubre 258 días (junio 2025 – marzo 2026). El clasificador es un Random Forest; las explicaciones combinan LEFTIST y contrafactuales NUN-CF.</p>
+</section>
+<section id="introducción" class="level2" data-number="6.3">
+<h2 data-number="6.3" class="anchored" data-anchor-id="introducción"><span class="header-section-number">6.3</span> 1. Introducción</h2>
+<section id="explicar-series-temporales" class="level3" data-number="6.3.1">
+<h3 data-number="6.3.1" class="anchored" data-anchor-id="explicar-series-temporales"><span class="header-section-number">6.3.1</span> Explicar series temporales</h3>
+<p>SHAP, LIME o PDP asumen tablas: una fila, un vector de variables. En una serie el orden importa y la pregunta pasa a ser qué instantes del pasado condicionan la predicción.</p>
+<p>TSInterpret está pensado para eso. LEFTIST, TSEvo o NativeGuide devuelven importancia por timestep, no por columnas sueltas.</p>
+</section>
+<section id="clasificación-de-demanda" class="level3" data-number="6.3.2">
+<h3 data-number="6.3.2" class="anchored" data-anchor-id="clasificación-de-demanda"><span class="header-section-number">6.3.2</span> Clasificación de demanda</h3>
+<p>Triplek registra pedidos por día. Modelamos si el día siguiente será de alta demanda o normal a partir de los 14 anteriores. \1</p>
+<pre><code>Entrada: últimos 14 días de pedidos
+Salida:  alta demanda (sí / no)</code></pre>
+</section>
+<section id="datos" class="level3" data-number="6.3.3">
+<h3 data-number="6.3.3" class="anchored" data-anchor-id="datos"><span class="header-section-number">6.3.3</span> Datos</h3>
+<p>La exportación tiene 17.582 pedidos en 258 días con actividad (23-jun-2025 a 08-mar-2026). Eso da unas 244 ventanas deslizantes; reservamos las últimas 60 para test.</p>
+<div id="8ac48f16" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2026-05-20T16:03:32.269179Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-05-20T16:03:32.269095Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-05-20T16:03:52.572135Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-05-20T16:03:52.571703Z&quot;}}" data-outputid="f807dc7e-da01-45fa-e7b4-ebd32dc61d08" data-execution_count="1">
+<details class="code-fold">
+<summary>Código</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># pip install -r requirements.txt  (tsinterpret y dependencias)</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os, types, warnings</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>warnings.filterwarnings(<span class="st">'ignore'</span>)</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.dates <span class="im">as</span> mdates</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.colors <span class="im">as</span> mcolors</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> seaborn <span class="im">as</span> sns</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> statsmodels.api <span class="im">as</span> sm</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.ensemble <span class="im">import</span> RandomForestClassifier</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.metrics <span class="im">import</span> classification_report, confusion_matrix, ConfusionMatrixDisplay</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.metrics.pairwise <span class="im">import</span> euclidean_distances</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> TSInterpret.InterpretabilityModels.leftist.leftist <span class="im">import</span> LEFTIST</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>os.makedirs(<span class="st">'figuras'</span>, exist_ok<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a><span class="cf">try</span>:</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>    plt.style.use(<span class="st">'seaborn-v0_8-whitegrid'</span>)</span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a><span class="cf">except</span> <span class="pp">OSError</span>:</span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>    plt.style.use(<span class="st">'ggplot'</span>)</span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>plt.rcParams[<span class="st">'figure.dpi'</span>] <span class="op">=</span> <span class="dv">120</span></span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>RANDOM_STATE <span class="op">=</span> <span class="dv">42</span></span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>np.random.seed(RANDOM_STATE)</span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'Entorno listo.'</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Entorno listo.</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="datos-1" class="level2" data-number="6.4">
+<h2 data-number="6.4" class="anchored" data-anchor-id="datos-1"><span class="header-section-number">6.4</span> 2. Datos</h2>
+<section id="pedidos" class="level3" data-number="6.4.1">
+<h3 data-number="6.4.1" class="anchored" data-anchor-id="pedidos"><span class="header-section-number">6.4.1</span> Pedidos</h3>
+<p>La fuente es el sistema interno de una hamburgueserías (La Viña y Centro). El CSV anonimizado incluye 17.582 pedidos entre junio de 2025 y marzo de 2026. Agregamos por día la variable <code>n_orders</code>.</p>
+</section>
+<section id="anonimización" class="level3" data-number="6.4.2">
+<h3 data-number="6.4.2" class="anchored" data-anchor-id="anonimización"><span class="header-section-number">6.4.2</span> Anonimización</h3>
+<p>Se quitaron teléfono, nombre, correo y dirección. <code>order_id</code> es un índice secuencial.</p>
+<div id="a54a5a1e" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2026-05-20T16:03:52.574575Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-05-20T16:03:52.574399Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-05-20T16:03:52.626052Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-05-20T16:03:52.625624Z&quot;}}" data-outputid="bb10ba58-db0b-41db-aa69-f1bf8dd29149" data-execution_count="2">
+<details class="code-fold">
+<summary>Código</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.read_csv(<span class="st">'data/triplekb-orders-anonymized.csv'</span>)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>df[<span class="st">'order_date'</span>] <span class="op">=</span> pd.to_datetime(df[<span class="st">'order_date'</span>])</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>daily <span class="op">=</span> (</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    df.groupby(<span class="st">'order_date'</span>)[<span class="st">'order_id'</span>]</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    .count()</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    .reset_index()</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    .rename(columns<span class="op">=</span>{<span class="st">'order_id'</span>: <span class="st">'n_orders'</span>})</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>    .sort_values(<span class="st">'order_date'</span>)</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>    .reset_index(drop<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>series_all <span class="op">=</span> daily[<span class="st">'n_orders'</span>].values.astype(<span class="bu">float</span>)</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>date_idx <span class="op">=</span> daily[<span class="st">'order_date'</span>]</span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f'Pedidos en exportación: </span><span class="sc">{</span><span class="bu">len</span>(df)<span class="sc">:,}</span><span class="ss">'</span>)</span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f'Días con demanda registrada: </span><span class="sc">{</span><span class="bu">len</span>(daily)<span class="sc">}</span><span class="ss">'</span>)</span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f'Rango: </span><span class="sc">{</span>daily[<span class="st">"order_date"</span>]<span class="sc">.</span><span class="bu">min</span>()<span class="sc">.</span>date()<span class="sc">}</span><span class="ss"> → </span><span class="sc">{</span>daily[<span class="st">"order_date"</span>]<span class="sc">.</span><span class="bu">max</span>()<span class="sc">.</span>date()<span class="sc">}</span><span class="ss">'</span>)</span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'</span><span class="ch">\n</span><span class="st">Pedidos por día (resumen):'</span>)</span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(daily[<span class="st">'n_orders'</span>].describe().<span class="bu">round</span>(<span class="dv">1</span>).to_string())</span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Pedidos en exportación: 17,582
+Días con demanda registrada: 258
+Rango: 2025-06-23 → 2026-03-08
+
+Pedidos por día (resumen):
+count    258.0
+mean      68.1
+std       47.5
+min        1.0
+25%       40.0
+50%       64.0
+75%       99.5
+max      182.0</code></pre>
+</div>
+</div>
+</section>
+<section id="exploración-serie-diaria-y-día-de-la-semana" class="level3" data-number="6.4.3">
+<h3 data-number="6.4.3" class="anchored" data-anchor-id="exploración-serie-diaria-y-día-de-la-semana"><span class="header-section-number">6.4.3</span> Exploración: serie diaria y día de la semana</h3>
+<div id="8c609292" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2026-05-20T16:03:52.627226Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-05-20T16:03:52.627148Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-05-20T16:03:53.033198Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-05-20T16:03:53.032667Z&quot;}}" data-outputid="5b8a8065-8b8d-44d4-d815-bff759827c46" data-execution_count="3">
+<details class="code-fold">
+<summary>Código</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">2</span>, figsize<span class="op">=</span>(<span class="dv">15</span>, <span class="dv">4</span>))</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>ax <span class="op">=</span> axes[<span class="dv">0</span>]</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>ax.plot(daily[<span class="st">'order_date'</span>], daily[<span class="st">'n_orders'</span>], alpha<span class="op">=</span><span class="fl">0.4</span>, color<span class="op">=</span><span class="st">'steelblue'</span>, lw<span class="op">=</span><span class="fl">0.8</span>)</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>roll <span class="op">=</span> daily.set_index(<span class="st">'order_date'</span>)[<span class="st">'n_orders'</span>].rolling(<span class="dv">7</span>).mean()</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>ax.plot(roll.index, roll.values, color<span class="op">=</span><span class="st">'darkorange'</span>, lw<span class="op">=</span><span class="dv">2</span>, label<span class="op">=</span><span class="st">'Media móvil 7 días'</span>)</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>ax.set_title(<span class="ss">f'Pedidos diarios — Triplek (</span><span class="sc">{</span><span class="bu">len</span>(daily)<span class="sc">}</span><span class="ss"> días)'</span>)</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>ax.set_ylabel(<span class="st">'Nº pedidos'</span>)</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>ax.legend()</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>ax.xaxis.set_major_formatter(mdates.DateFormatter(<span class="st">'%b %y'</span>))</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>ax.xaxis.set_major_locator(mdates.MonthLocator())</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>plt.setp(ax.get_xticklabels(), rotation<span class="op">=</span><span class="dv">30</span>)</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>ax2 <span class="op">=</span> axes[<span class="dv">1</span>]</span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>dias_es <span class="op">=</span> [<span class="st">'Lun'</span>, <span class="st">'Mar'</span>, <span class="st">'Mié'</span>, <span class="st">'Jue'</span>, <span class="st">'Vie'</span>, <span class="st">'Sáb'</span>, <span class="st">'Dom'</span>]</span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>por_dia <span class="op">=</span> daily.assign(dow<span class="op">=</span>daily[<span class="st">'order_date'</span>].dt.dayofweek).groupby(<span class="st">'dow'</span>)[<span class="st">'n_orders'</span>].mean()</span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>colors <span class="op">=</span> [<span class="st">'#e74c3c'</span> <span class="cf">if</span> i <span class="op">&gt;=</span> <span class="dv">4</span> <span class="cf">else</span> <span class="st">'#3498db'</span> <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">7</span>)]</span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>ax2.bar(dias_es, por_dia.values, color<span class="op">=</span>colors)</span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>ax2.set_title(<span class="st">'Demanda media por día de semana'</span>)</span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>ax2.set_ylabel(<span class="st">'Pedidos / día'</span>)</span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">'figuras/01_eda.png'</span>, dpi<span class="op">=</span><span class="dv">150</span>, bbox_inches<span class="op">=</span><span class="st">'tight'</span>)</span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a>plt.show()</span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f'Mayor media semanal: </span><span class="sc">{</span>dias_es[por_dia.idxmax()]<span class="sc">}</span><span class="ss"> (</span><span class="sc">{</span>por_dia<span class="sc">.</span><span class="bu">max</span>()<span class="sc">:.1f}</span><span class="ss"> pedidos/día)'</span>)</span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="capitulo_files/figure-html/cell-4-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Mayor media semanal: Dom (113.2 pedidos/día)</code></pre>
+</div>
+</div>
+<p>En la figura 1, a la izquierda se ve la serie diaria con la media móvil de una semana en naranja. \1suaviza el ruido y deja claro que hay ondas repetidas cada pocos días. A la derecha, el domingo se lleva la mayor media (unos 113 pedidos), casi el doble que un día entre semana. Por eso tiene sentido mirar dos semanas hacia atrás cuando predecimos el día siguiente.</p>
+</section>
+</section>
+<section id="serie-de-demanda-diaria" class="level2" data-number="6.5">
+<h2 data-number="6.5" class="anchored" data-anchor-id="serie-de-demanda-diaria"><span class="header-section-number">6.5</span> 3. Serie de demanda diaria</h2>
+<p>Revisamos tendencia y estacionalidad semanal con descomposición aditiva (periodo 7) sobre los 258 días reales agregados del CSV.</p>
+<div id="cc3e52b3" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2026-05-20T16:03:53.034473Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-05-20T16:03:53.034401Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-05-20T16:03:53.172673Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-05-20T16:03:53.172196Z&quot;}}" data-outputid="1a860c47-d65b-4911-cb74-3d1c5e9a7bf5" data-execution_count="4">
+<details class="code-fold">
+<summary>Código</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>series_pd <span class="op">=</span> pd.Series(series_all, index<span class="op">=</span>date_idx)</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f'Serie de demanda: </span><span class="sc">{</span><span class="bu">len</span>(series_all)<span class="sc">}</span><span class="ss"> días | media=</span><span class="sc">{</span>series_all<span class="sc">.</span>mean()<span class="sc">:.1f}</span><span class="ss"> | std=</span><span class="sc">{</span>series_all<span class="sc">.</span>std()<span class="sc">:.1f}</span><span class="ss">'</span>)</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">14</span>, <span class="dv">4</span>))</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>ax.plot(date_idx, series_all, color<span class="op">=</span><span class="st">'steelblue'</span>, lw<span class="op">=</span><span class="fl">0.8</span>)</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>ax.set_title(<span class="ss">f'Demanda diaria — Triplek (</span><span class="sc">{</span><span class="bu">len</span>(daily)<span class="sc">}</span><span class="ss"> días)'</span>)</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>ax.set_xlabel(<span class="st">'Fecha'</span>)</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>ax.set_ylabel(<span class="st">'Nº pedidos'</span>)</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">'figuras/02_serie_historica.png'</span>, dpi<span class="op">=</span><span class="dv">150</span>, bbox_inches<span class="op">=</span><span class="st">'tight'</span>)</span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>plt.show()</span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Serie de demanda: 258 días | media=68.1 | std=47.4</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="capitulo_files/figure-html/cell-5-output-2.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>La figura 2 recorre los 258 días completos. Hay mucha dispersión (desde días casi vacíos hasta picos de más de 180 pedidos) y un ritmo que se repite: subidas en fin de semana y bajadas en entre semana. No parece una tendencia lineal fuerte en nueve meses; si hubiera estacionalidad anual, harían falta más años para verla con calma.</p>
+</section>
+<section id="ventanas-y-etiquetas" class="level2" data-number="6.6">
+<h2 data-number="6.6" class="anchored" data-anchor-id="ventanas-y-etiquetas"><span class="header-section-number">6.6</span> 4. Ventanas y etiquetas</h2>
+<p>Cada instancia usa 14 días como entrada y el día siguiente como objetivo. La etiqueta alta demanda es el tercio superior de pedidos/día (percentil 67 calculado en el histórico). \1</p>
+<pre><code>X_i = [n_{i-14}, ..., n_{i-1}]
+y_i = 1  si  n_i &gt;= percentil_67</code></pre>
+<p>TSInterpret espera <code>(muestras, 14, 1)</code>. Split temporal: últimas 60 instancias en test.</p>
+<div id="c4df53a3" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2026-05-20T16:03:53.174301Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-05-20T16:03:53.174097Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-05-20T16:03:53.177831Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-05-20T16:03:53.177472Z&quot;}}" data-outputid="7a0ef07a-7ad2-482c-d493-18ef3796c5f1" data-execution_count="5">
+<details class="code-fold">
+<summary>Código</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>WINDOW <span class="op">=</span> <span class="dv">14</span>   <span class="co"># 2 semanas de pasado</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> create_windows(series, w):</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>    X, y <span class="op">=</span> [], []</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(w, <span class="bu">len</span>(series)):</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>        X.append(series[i<span class="op">-</span>w:i])</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>        y.append(series[i])</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> np.array(X), np.array(y)</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>X_all, y_reg <span class="op">=</span> create_windows(series_all, WINDOW)</span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Umbral de clasificación: percentil 67 (≈ top tercio)</span></span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>THRESHOLD <span class="op">=</span> np.percentile(y_reg, <span class="dv">67</span>)</span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>y_clf <span class="op">=</span> (y_reg <span class="op">&gt;=</span> THRESHOLD).astype(<span class="bu">int</span>)</span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Instancias creadas: </span><span class="sc">{</span>X_all<span class="sc">.</span>shape[<span class="dv">0</span>]<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Umbral ALTA demanda: </span><span class="sc">{</span>THRESHOLD<span class="sc">:.0f}</span><span class="ss"> pedidos/día"</span>)</span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Distribución: </span><span class="sc">{</span>y_clf<span class="sc">.</span>mean()<span class="sc">:.1%}</span><span class="ss"> días ALTA | </span><span class="sc">{</span><span class="dv">1</span><span class="op">-</span>y_clf<span class="sc">.</span>mean()<span class="sc">:.1%}</span><span class="ss"> días NORMAL"</span>)</span>
+<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a><span class="co"># Split temporal: últimas 60 instancias como test</span></span>
+<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a>SPLIT <span class="op">=</span> <span class="bu">len</span>(X_all) <span class="op">-</span> <span class="dv">60</span></span>
+<span id="cb11-22"><a href="#cb11-22" aria-hidden="true" tabindex="-1"></a>X_train_2d, X_test_2d <span class="op">=</span> X_all[:SPLIT],  X_all[SPLIT:]</span>
+<span id="cb11-23"><a href="#cb11-23" aria-hidden="true" tabindex="-1"></a>y_train,    y_test     <span class="op">=</span> y_clf[:SPLIT],  y_clf[SPLIT:]</span>
+<span id="cb11-24"><a href="#cb11-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-25"><a href="#cb11-25" aria-hidden="true" tabindex="-1"></a><span class="co"># Formato 3D para TSInterpret: (n, time, 1)</span></span>
+<span id="cb11-26"><a href="#cb11-26" aria-hidden="true" tabindex="-1"></a>X_train_3d <span class="op">=</span> X_train_2d.reshape(<span class="op">-</span><span class="dv">1</span>, WINDOW, <span class="dv">1</span>)</span>
+<span id="cb11-27"><a href="#cb11-27" aria-hidden="true" tabindex="-1"></a>X_test_3d  <span class="op">=</span> X_test_2d.reshape(<span class="op">-</span><span class="dv">1</span>, WINDOW, <span class="dv">1</span>)</span>
+<span id="cb11-28"><a href="#cb11-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-29"><a href="#cb11-29" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">Train: </span><span class="sc">{</span><span class="bu">len</span>(X_train_2d)<span class="sc">}</span><span class="ss"> instancias"</span>)</span>
+<span id="cb11-30"><a href="#cb11-30" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Test:  </span><span class="sc">{</span><span class="bu">len</span>(X_test_2d)<span class="sc">}</span><span class="ss"> instancias"</span>)</span>
+<span id="cb11-31"><a href="#cb11-31" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Forma TSInterpret: </span><span class="sc">{</span>X_train_3d<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Instancias creadas: 244
+Umbral ALTA demanda: 88 pedidos/día
+Distribución: 34.0% días ALTA | 66.0% días NORMAL
+
+Train: 184 instancias
+Test:  60 instancias
+Forma TSInterpret: (184, 14, 1)</code></pre>
+</div>
+</div>
+</section>
+<section id="modelo" class="level2" data-number="6.7">
+<h2 data-number="6.7" class="anchored" data-anchor-id="modelo"><span class="header-section-number">6.7</span> 5. Modelo</h2>
+<p>Random Forest (200 árboles, profundidad 8). Se entrena en <code>(n, 14)</code>; para LEFTIST envolvemos <code>predict_proba</code> para aceptar <code>(batch, 14, 1)</code>.</p>
+<div id="dc16808a" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2026-05-20T16:03:53.179245Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-05-20T16:03:53.179182Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-05-20T16:03:53.625371Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-05-20T16:03:53.624333Z&quot;}}" data-outputid="9ba271de-ba91-4821-e758-f8b95b6eccec" data-execution_count="6">
+<details class="code-fold">
+<summary>Código</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>clf <span class="op">=</span> RandomForestClassifier(n_estimators<span class="op">=</span><span class="dv">200</span>, max_depth<span class="op">=</span><span class="dv">8</span>,</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>                              random_state<span class="op">=</span>RANDOM_STATE, n_jobs<span class="op">=-</span><span class="dv">1</span>)</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>clf.fit(X_train_2d, y_train)</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>y_pred <span class="op">=</span> clf.predict(X_test_2d)</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>y_proba <span class="op">=</span> clf.predict_proba(X_test_2d)</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"=== Evaluación en test ==="</span>)</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(classification_report(y_test, y_pred, target_names<span class="op">=</span>[<span class="st">'Normal (0)'</span>, <span class="st">'Alta (1)'</span>]))</span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">2</span>, figsize<span class="op">=</span>(<span class="dv">12</span>, <span class="dv">4</span>))</span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Confusion matrix</span></span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>cm <span class="op">=</span> confusion_matrix(y_test, y_pred)</span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>ConfusionMatrixDisplay(cm, display_labels<span class="op">=</span>[<span class="st">'Normal'</span>,<span class="st">'Alta'</span>]).plot(ax<span class="op">=</span>axes[<span class="dv">0</span>], colorbar<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].set_title(<span class="st">'Matriz de confusión (test)'</span>)</span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a><span class="co"># Probabilidades predichas</span></span>
+<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].hist(y_proba[y_test<span class="op">==</span><span class="dv">0</span>, <span class="dv">1</span>], bins<span class="op">=</span><span class="dv">15</span>, alpha<span class="op">=</span><span class="fl">0.7</span>, color<span class="op">=</span><span class="st">'steelblue'</span>, label<span class="op">=</span><span class="st">'Real=Normal'</span>)</span>
+<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].hist(y_proba[y_test<span class="op">==</span><span class="dv">1</span>, <span class="dv">1</span>], bins<span class="op">=</span><span class="dv">15</span>, alpha<span class="op">=</span><span class="fl">0.7</span>, color<span class="op">=</span><span class="st">'tomato'</span>,    label<span class="op">=</span><span class="st">'Real=Alta'</span>)</span>
+<span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].axvline(<span class="fl">0.5</span>, color<span class="op">=</span><span class="st">'black'</span>, ls<span class="op">=</span><span class="st">'--'</span>, lw<span class="op">=</span><span class="fl">1.5</span>, label<span class="op">=</span><span class="st">'Umbral 0.5'</span>)</span>
+<span id="cb13-21"><a href="#cb13-21" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].set_xlabel(<span class="st">'P(Alta demanda)'</span>)<span class="op">;</span> axes[<span class="dv">1</span>].set_ylabel(<span class="st">'Frecuencia'</span>)</span>
+<span id="cb13-22"><a href="#cb13-22" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].set_title(<span class="st">'Distribución de probabilidades predichas'</span>)</span>
+<span id="cb13-23"><a href="#cb13-23" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].legend()</span>
+<span id="cb13-24"><a href="#cb13-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-25"><a href="#cb13-25" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb13-26"><a href="#cb13-26" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">'figuras/03_evaluacion_modelo.png'</span>, dpi<span class="op">=</span><span class="dv">150</span>, bbox_inches<span class="op">=</span><span class="st">'tight'</span>)</span>
+<span id="cb13-27"><a href="#cb13-27" aria-hidden="true" tabindex="-1"></a>plt.show()</span>
+<span id="cb13-28"><a href="#cb13-28" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>=== Evaluación en test ===
+              precision    recall  f1-score   support
+
+  Normal (0)       0.86      0.88      0.87        34
+    Alta (1)       0.84      0.81      0.82        26
+
+    accuracy                           0.85        60
+   macro avg       0.85      0.85      0.85        60
+weighted avg       0.85      0.85      0.85        60
+</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="capitulo_files/figure-html/cell-7-output-2.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>En la figura 3, la matriz de la izquierda resume el test: 51 aciertos de 60 (85 %). Falla un poco más en días altos (21 de 26) que en normales (30 de 34). A la derecha, las probabilidades se separan bastante bien: los normales quedan con P(alta) baja y los altos se acercan a 1, aunque en el centro hay mezcla y ahí salen los errores.</p>
+</section>
+<section id="explicaciones-con-tsinterpret" class="level2" data-number="6.8">
+<h2 data-number="6.8" class="anchored" data-anchor-id="explicaciones-con-tsinterpret"><span class="header-section-number">6.8</span> 6. Explicaciones con TSInterpret</h2>
+<p>Usamos dos vías. \1 | Método | Qué responde | |——–|—————-| | LEFTIST | Qué días del pasado empujaron la clase predicha | | NUN-CF (manual) | Qué ventana del train de la otra clase se parece más |</p>
+<p>En la versión 0.4.7 de TSInterpret, TSEvo, COMTECF y NativeGuideCF fallan con Python 3.12 y backends sklearn; NUN-CF lo implementamos a mano siguiendo Delaney et al.&nbsp;(2021).</p>
+<section id="leftist" class="level3" data-number="6.8.1">
+<h3 data-number="6.8.1" class="anchored" data-anchor-id="leftist"><span class="header-section-number">6.8.1</span> 6.1 LEFTIST</h3>
+<p>LEFTIST segmenta la ventana, perturba cada tramo (media del segmento) y estima contribución con LIME. El mapa positivo favorece alta demanda; el negativo, normal.</p>
+<p>Corrección local en <code>_shape_explanations</code> (v0.4.7): <code>values_per_slice</code> debe ser <code>len(series) // nb_interpretable_feature</code>, no <code>nb_interpretable_feature</code>. Patch con <code>types.MethodType</code> sin tocar el paquete instalado.</p>
+<div id="7c409621" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2026-05-20T16:03:53.628715Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-05-20T16:03:53.628362Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-05-20T16:03:53.648084Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-05-20T16:03:53.647574Z&quot;}}" data-outputid="b92d67f0-d8a1-44a2-d03c-6ec2c8d574c6" data-execution_count="7">
+<details class="code-fold">
+<summary>Código</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Función de predicción compatible con el formato 3D de TSInterpret</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="co"># TSInterpret pasa (batch, time, feat); sklearn necesita (batch, time*feat)</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> predict_fn(item):</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> clf.predict_proba(item.reshape(item.shape[<span class="dv">0</span>], <span class="op">-</span><span class="dv">1</span>))</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Verificación</span></span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>test_batch <span class="op">=</span> X_test_3d[:<span class="dv">3</span>]</span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>proba <span class="op">=</span> predict_fn(test_batch)</span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"predict_fn: </span><span class="sc">{</span>test_batch<span class="sc">.</span>shape<span class="sc">}</span><span class="ss"> → </span><span class="sc">{</span>proba<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">  ✓"</span>)</span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a><span class="co"># ── Patch del bug de _shape_explanations ──────────────────────────────────</span></span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>N_SEGMENTS <span class="op">=</span> <span class="dv">7</span>   <span class="co"># 7 segmentos de 2 días cada uno (14 días / 7 = 2)</span></span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> fixed_shape_explanations(<span class="va">self</span>, explanations, series):</span>
+<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Corrige values_per_slice = len(series) // nb_interpretable_feature."""</span></span>
+<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a>    n_seg    <span class="op">=</span> <span class="va">self</span>.nb_interpretable_feature</span>
+<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a>    seg_size <span class="op">=</span> <span class="bu">max</span>(<span class="dv">1</span>, <span class="bu">len</span>(series) <span class="op">//</span> n_seg)</span>
+<span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a>    heatmaps <span class="op">=</span> []</span>
+<span id="cb15-19"><a href="#cb15-19" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="bu">len</span>(explanations)):</span>
+<span id="cb15-20"><a href="#cb15-20" aria-hidden="true" tabindex="-1"></a>        heatmap <span class="op">=</span> np.zeros(<span class="bu">len</span>(series))</span>
+<span id="cb15-21"><a href="#cb15-21" aria-hidden="true" tabindex="-1"></a>        j <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb15-22"><a href="#cb15-22" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> value <span class="kw">in</span> explanations[i][<span class="dv">0</span>]:</span>
+<span id="cb15-23"><a href="#cb15-23" aria-hidden="true" tabindex="-1"></a>            end <span class="op">=</span> <span class="bu">min</span>(j <span class="op">+</span> seg_size, <span class="bu">len</span>(heatmap))</span>
+<span id="cb15-24"><a href="#cb15-24" aria-hidden="true" tabindex="-1"></a>            heatmap[j:end] <span class="op">=</span> <span class="bu">float</span>(value)</span>
+<span id="cb15-25"><a href="#cb15-25" aria-hidden="true" tabindex="-1"></a>            j <span class="op">=</span> end</span>
+<span id="cb15-26"><a href="#cb15-26" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> j <span class="op">&gt;=</span> <span class="bu">len</span>(heatmap):</span>
+<span id="cb15-27"><a href="#cb15-27" aria-hidden="true" tabindex="-1"></a>                <span class="cf">break</span></span>
+<span id="cb15-28"><a href="#cb15-28" aria-hidden="true" tabindex="-1"></a>        heatmaps.append(heatmap)</span>
+<span id="cb15-29"><a href="#cb15-29" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> heatmaps</span>
+<span id="cb15-30"><a href="#cb15-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-31"><a href="#cb15-31" aria-hidden="true" tabindex="-1"></a><span class="co"># Inicializar LEFTIST</span></span>
+<span id="cb15-32"><a href="#cb15-32" aria-hidden="true" tabindex="-1"></a>leftist <span class="op">=</span> LEFTIST(</span>
+<span id="cb15-33"><a href="#cb15-33" aria-hidden="true" tabindex="-1"></a>    model<span class="op">=</span>predict_fn,</span>
+<span id="cb15-34"><a href="#cb15-34" aria-hidden="true" tabindex="-1"></a>    data<span class="op">=</span>(X_train_3d, y_train),</span>
+<span id="cb15-35"><a href="#cb15-35" aria-hidden="true" tabindex="-1"></a>    mode<span class="op">=</span><span class="st">'time'</span>,</span>
+<span id="cb15-36"><a href="#cb15-36" aria-hidden="true" tabindex="-1"></a>    backend<span class="op">=</span><span class="st">'F'</span>,                       <span class="co"># F = función directa (no SK/TF/PYT)</span></span>
+<span id="cb15-37"><a href="#cb15-37" aria-hidden="true" tabindex="-1"></a>    nb_interpretable_feature<span class="op">=</span>N_SEGMENTS,</span>
+<span id="cb15-38"><a href="#cb15-38" aria-hidden="true" tabindex="-1"></a>    transform_name<span class="op">=</span><span class="st">'mean'</span>,             <span class="co"># perturba reemplazando segmento con su media</span></span>
+<span id="cb15-39"><a href="#cb15-39" aria-hidden="true" tabindex="-1"></a>    learning_process_name<span class="op">=</span><span class="st">'Lime'</span>,</span>
+<span id="cb15-40"><a href="#cb15-40" aria-hidden="true" tabindex="-1"></a>    nb_neighbors<span class="op">=</span><span class="dv">1000</span>,</span>
+<span id="cb15-41"><a href="#cb15-41" aria-hidden="true" tabindex="-1"></a>    explanation_size<span class="op">=</span>N_SEGMENTS,       <span class="co"># retorna peso para todos los segmentos</span></span>
+<span id="cb15-42"><a href="#cb15-42" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb15-43"><a href="#cb15-43" aria-hidden="true" tabindex="-1"></a><span class="co"># Aplicar patch</span></span>
+<span id="cb15-44"><a href="#cb15-44" aria-hidden="true" tabindex="-1"></a>leftist._shape_explanations <span class="op">=</span> types.MethodType(fixed_shape_explanations, leftist)</span>
+<span id="cb15-45"><a href="#cb15-45" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"LEFTIST inicializado con patch aplicado."</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>predict_fn: (3, 14, 1) → (3, 2)  ✓
+The Predict Function was given directly
+LEFTIST inicializado con patch aplicado.</code></pre>
+</div>
+</div>
+<div id="48ffd70e" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2026-05-20T16:03:53.649407Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-05-20T16:03:53.649326Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-05-20T16:03:53.654426Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-05-20T16:03:53.653513Z&quot;}}" data-outputid="0f6693f3-02b6-4aad-b189-6fc5aaed67bb" data-execution_count="8">
+<details class="code-fold">
+<summary>Código</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> plot_leftist_heatmap(ax, instance_2d, heatmap, pred_class, true_class,</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>                          title<span class="op">=</span><span class="st">''</span>, window<span class="op">=</span><span class="dv">14</span>, threshold<span class="op">=</span>THRESHOLD):</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Visualiza la ventana temporal con heatmap LEFTIST superpuesto."""</span></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>    timesteps <span class="op">=</span> np.arange(window)</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>    labels    <span class="op">=</span> [<span class="ss">f't-</span><span class="sc">{</span>window<span class="op">-</span>i<span class="sc">}</span><span class="ss">'</span> <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(window)]</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Heatmap de fondo (colores) — TwoSlopeNorm requiere vmin &lt; 0 &lt; vmax</span></span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>    h_min, h_max <span class="op">=</span> heatmap.<span class="bu">min</span>(), heatmap.<span class="bu">max</span>()</span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> h_max <span class="op">&lt;=</span> <span class="dv">0</span>:</span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>        norm <span class="op">=</span> mcolors.Normalize(vmin<span class="op">=</span>h_min, vmax<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>    <span class="cf">elif</span> h_min <span class="op">&gt;=</span> <span class="dv">0</span>:</span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>        norm <span class="op">=</span> mcolors.Normalize(vmin<span class="op">=</span><span class="dv">0</span>, vmax<span class="op">=</span><span class="bu">max</span>(h_max, <span class="fl">1e-9</span>))</span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>:</span>
+<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a>        norm <span class="op">=</span> mcolors.TwoSlopeNorm(vmin<span class="op">=</span>h_min, vcenter<span class="op">=</span><span class="dv">0</span>, vmax<span class="op">=</span>h_max)</span>
+<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a>    cmap <span class="op">=</span> plt.cm.RdYlBu_r</span>
+<span id="cb17-16"><a href="#cb17-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-17"><a href="#cb17-17" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Barras de importancia en el fondo</span></span>
+<span id="cb17-18"><a href="#cb17-18" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> t <span class="kw">in</span> <span class="bu">range</span>(window):</span>
+<span id="cb17-19"><a href="#cb17-19" aria-hidden="true" tabindex="-1"></a>        color <span class="op">=</span> cmap(norm(heatmap[t]))</span>
+<span id="cb17-20"><a href="#cb17-20" aria-hidden="true" tabindex="-1"></a>        ax.axvspan(t <span class="op">-</span> <span class="fl">0.5</span>, t <span class="op">+</span> <span class="fl">0.5</span>, alpha<span class="op">=</span><span class="fl">0.4</span>, color<span class="op">=</span>color, zorder<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb17-21"><a href="#cb17-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-22"><a href="#cb17-22" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Serie temporal</span></span>
+<span id="cb17-23"><a href="#cb17-23" aria-hidden="true" tabindex="-1"></a>    ax.plot(timesteps, instance_2d, <span class="st">'o-'</span>, color<span class="op">=</span><span class="st">'black'</span>, lw<span class="op">=</span><span class="fl">1.5</span>, ms<span class="op">=</span><span class="dv">5</span>, zorder<span class="op">=</span><span class="dv">3</span>)</span>
+<span id="cb17-24"><a href="#cb17-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-25"><a href="#cb17-25" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Línea de umbral</span></span>
+<span id="cb17-26"><a href="#cb17-26" aria-hidden="true" tabindex="-1"></a>    ax.axhline(threshold, color<span class="op">=</span><span class="st">'red'</span>, ls<span class="op">=</span><span class="st">'--'</span>, lw<span class="op">=</span><span class="dv">1</span>, alpha<span class="op">=</span><span class="fl">0.8</span>, label<span class="op">=</span><span class="ss">f'Umbral ALTA=</span><span class="sc">{</span>threshold<span class="sc">:.0f}</span><span class="ss">'</span>)</span>
+<span id="cb17-27"><a href="#cb17-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-28"><a href="#cb17-28" aria-hidden="true" tabindex="-1"></a>    ax.set_xticks(timesteps)</span>
+<span id="cb17-29"><a href="#cb17-29" aria-hidden="true" tabindex="-1"></a>    ax.set_xticklabels(labels, rotation<span class="op">=</span><span class="dv">45</span>, fontsize<span class="op">=</span><span class="dv">8</span>)</span>
+<span id="cb17-30"><a href="#cb17-30" aria-hidden="true" tabindex="-1"></a>    ax.set_ylabel(<span class="st">'Pedidos/día'</span>)</span>
+<span id="cb17-31"><a href="#cb17-31" aria-hidden="true" tabindex="-1"></a>    ax.legend(fontsize<span class="op">=</span><span class="dv">8</span>, loc<span class="op">=</span><span class="st">'upper left'</span>)</span>
+<span id="cb17-32"><a href="#cb17-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-33"><a href="#cb17-33" aria-hidden="true" tabindex="-1"></a>    clase_pred <span class="op">=</span> <span class="st">'ALTA'</span> <span class="cf">if</span> pred_class <span class="op">==</span> <span class="dv">1</span> <span class="cf">else</span> <span class="st">'NORMAL'</span></span>
+<span id="cb17-34"><a href="#cb17-34" aria-hidden="true" tabindex="-1"></a>    clase_real <span class="op">=</span> <span class="st">'ALTA'</span> <span class="cf">if</span> true_class <span class="op">==</span> <span class="dv">1</span> <span class="cf">else</span> <span class="st">'NORMAL'</span></span>
+<span id="cb17-35"><a href="#cb17-35" aria-hidden="true" tabindex="-1"></a>    color_title <span class="op">=</span> <span class="st">'darkred'</span> <span class="cf">if</span> pred_class <span class="op">==</span> <span class="dv">1</span> <span class="cf">else</span> <span class="st">'steelblue'</span></span>
+<span id="cb17-36"><a href="#cb17-36" aria-hidden="true" tabindex="-1"></a>    ax.set_title(<span class="ss">f'</span><span class="sc">{</span>title<span class="sc">}</span><span class="ch">\n</span><span class="ss">Predicción: </span><span class="sc">{</span>clase_pred<span class="sc">}</span><span class="ss"> | Real: </span><span class="sc">{</span>clase_real<span class="sc">}</span><span class="ss">'</span>,</span>
+<span id="cb17-37"><a href="#cb17-37" aria-hidden="true" tabindex="-1"></a>                 fontsize<span class="op">=</span><span class="dv">10</span>, color<span class="op">=</span>color_title)</span>
+<span id="cb17-38"><a href="#cb17-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-39"><a href="#cb17-39" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Colorbar</span></span>
+<span id="cb17-40"><a href="#cb17-40" aria-hidden="true" tabindex="-1"></a>    sm_cb <span class="op">=</span> plt.cm.ScalarMappable(cmap<span class="op">=</span>cmap, norm<span class="op">=</span>norm)</span>
+<span id="cb17-41"><a href="#cb17-41" aria-hidden="true" tabindex="-1"></a>    sm_cb.set_array([])</span>
+<span id="cb17-42"><a href="#cb17-42" aria-hidden="true" tabindex="-1"></a>    plt.colorbar(sm_cb, ax<span class="op">=</span>ax, label<span class="op">=</span><span class="st">'Importancia LEFTIST'</span>, pad<span class="op">=</span><span class="fl">0.01</span>, shrink<span class="op">=</span><span class="fl">0.8</span>)</span>
+<span id="cb17-43"><a href="#cb17-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-44"><a href="#cb17-44" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Función de visualización definida."</span>)</span>
+<span id="cb17-45"><a href="#cb17-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-46"><a href="#cb17-46" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Función de visualización definida.</code></pre>
+</div>
+</div>
+</section>
+<section id="casos-locales" class="level3" data-number="6.8.2">
+<h3 data-number="6.8.2" class="anchored" data-anchor-id="casos-locales"><span class="header-section-number">6.8.2</span> 6.1.1 Casos locales</h3>
+<p>Cuatro ejemplos del test bien clasificados: dos alta y dos normal.</p>
+<div id="0abb79ce" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2026-05-20T16:03:53.656729Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-05-20T16:03:53.656612Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-05-20T16:03:54.654416Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-05-20T16:03:54.653672Z&quot;}}" data-outputid="2dd7ba4c-c896-44e0-fd5c-5c42492b7ff5" data-execution_count="9">
+<details class="code-fold">
+<summary>Código</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Seleccionar casos representativos</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>idx_tp <span class="op">=</span> np.where((y_test <span class="op">==</span> <span class="dv">1</span>) <span class="op">&amp;</span> (y_pred <span class="op">==</span> <span class="dv">1</span>))[<span class="dv">0</span>][:<span class="dv">2</span>]  <span class="co"># True Positives (Alta bien)</span></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>idx_tn <span class="op">=</span> np.where((y_test <span class="op">==</span> <span class="dv">0</span>) <span class="op">&amp;</span> (y_pred <span class="op">==</span> <span class="dv">0</span>))[<span class="dv">0</span>][:<span class="dv">2</span>]  <span class="co"># True Negatives (Normal bien)</span></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>casos <span class="op">=</span> <span class="bu">list</span>(idx_tp) <span class="op">+</span> <span class="bu">list</span>(idx_tn)</span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>titulos <span class="op">=</span> [<span class="st">'Alta correctamente predicha (TP)'</span>, <span class="st">'Alta correctamente predicha (TP)'</span>,</span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>           <span class="st">'Normal correctamente predicha (TN)'</span>, <span class="st">'Normal correctamente predicha (TN)'</span>]</span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">2</span>, <span class="dv">2</span>, figsize<span class="op">=</span>(<span class="dv">16</span>, <span class="dv">9</span>))</span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>axes <span class="op">=</span> axes.flatten()</span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> ax, idx, titulo <span class="kw">in</span> <span class="bu">zip</span>(axes, casos, titulos):</span>
+<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a>    inst_3d  <span class="op">=</span> X_test_3d[idx:idx<span class="op">+</span><span class="dv">1</span>]     <span class="co"># (1, 14, 1)</span></span>
+<span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a>    inst_2d  <span class="op">=</span> X_test_2d[idx]            <span class="co"># (14,)</span></span>
+<span id="cb19-15"><a href="#cb19-15" aria-hidden="true" tabindex="-1"></a>    pc       <span class="op">=</span> <span class="bu">int</span>(y_pred[idx])</span>
+<span id="cb19-16"><a href="#cb19-16" aria-hidden="true" tabindex="-1"></a>    tc       <span class="op">=</span> <span class="bu">int</span>(y_test[idx])</span>
+<span id="cb19-17"><a href="#cb19-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-18"><a href="#cb19-18" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Explicar con LEFTIST</span></span>
+<span id="cb19-19"><a href="#cb19-19" aria-hidden="true" tabindex="-1"></a>    exp <span class="op">=</span> leftist.explain(inst_3d, idx_label<span class="op">=</span>pc)</span>
+<span id="cb19-20"><a href="#cb19-20" aria-hidden="true" tabindex="-1"></a>    heatmap <span class="op">=</span> exp[<span class="dv">0</span>]   <span class="co"># shape (14,)</span></span>
+<span id="cb19-21"><a href="#cb19-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-22"><a href="#cb19-22" aria-hidden="true" tabindex="-1"></a>    plot_leftist_heatmap(ax, inst_2d, heatmap, pc, tc, title<span class="op">=</span>titulo)</span>
+<span id="cb19-23"><a href="#cb19-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-24"><a href="#cb19-24" aria-hidden="true" tabindex="-1"></a>plt.suptitle(<span class="st">'LEFTIST — Explicaciones locales: qué días del pasado determinaron la clasificación'</span>,</span>
+<span id="cb19-25"><a href="#cb19-25" aria-hidden="true" tabindex="-1"></a>             fontsize<span class="op">=</span><span class="dv">13</span>, y<span class="op">=</span><span class="fl">1.01</span>)</span>
+<span id="cb19-26"><a href="#cb19-26" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb19-27"><a href="#cb19-27" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">'figuras/04_leftist_local.png'</span>, dpi<span class="op">=</span><span class="dv">150</span>, bbox_inches<span class="op">=</span><span class="st">'tight'</span>)</span>
+<span id="cb19-28"><a href="#cb19-28" aria-hidden="true" tabindex="-1"></a>plt.show()</span>
+<span id="cb19-29"><a href="#cb19-29" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="capitulo_files/figure-html/cell-10-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>La figura 4 muestra cuatro casos del test bien clasificados. En cada panel, la línea negra es la ventana de 14 días y el fondo de color es LEFTIST: rojo empuja hacia alta, azul hacia normal. Cuando el modelo acierta un día alto, suele pintar fuerte los últimos días de la ventana; cuando acierta un normal, el mapa es más repartido o inclina al azul en esos mismos lags.</p>
+</section>
+<section id="importancia-agregada" class="level3" data-number="6.8.3">
+<h3 data-number="6.8.3" class="anchored" data-anchor-id="importancia-agregada"><span class="header-section-number">6.8.3</span> 6.2 Importancia agregada</h3>
+<p>LEFTIST en cada acierto del test; promediamos heatmaps por clase predicha para ver qué lags importan en conjunto.</p>
+<div id="d2b6d3f5" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2026-05-20T16:03:54.657098Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-05-20T16:03:54.656973Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-05-20T16:03:56.422397Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-05-20T16:03:56.421922Z&quot;}}" data-outputid="82d5c069-4c5e-4743-c24e-6c2d31abba34" data-execution_count="10">
+<details class="code-fold">
+<summary>Código</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Calcular LEFTIST sobre todas las instancias del test correctamente clasificadas</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>correct_idx <span class="op">=</span> np.where(y_pred <span class="op">==</span> y_test)[<span class="dv">0</span>]</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Instancias correctamente clasificadas en test: </span><span class="sc">{</span><span class="bu">len</span>(correct_idx)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>heatmaps_alta   <span class="op">=</span> []</span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>heatmaps_normal <span class="op">=</span> []</span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> idx <span class="kw">in</span> correct_idx:</span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>    inst_3d <span class="op">=</span> X_test_3d[idx:idx<span class="op">+</span><span class="dv">1</span>]</span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a>    pc      <span class="op">=</span> <span class="bu">int</span>(y_pred[idx])</span>
+<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a>    exp     <span class="op">=</span> leftist.explain(inst_3d, idx_label<span class="op">=</span>pc)</span>
+<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a>    h       <span class="op">=</span> exp[<span class="dv">0</span>]</span>
+<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> pc <span class="op">==</span> <span class="dv">1</span>:</span>
+<span id="cb20-15"><a href="#cb20-15" aria-hidden="true" tabindex="-1"></a>        heatmaps_alta.append(h)</span>
+<span id="cb20-16"><a href="#cb20-16" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>:</span>
+<span id="cb20-17"><a href="#cb20-17" aria-hidden="true" tabindex="-1"></a>        heatmaps_normal.append(np.<span class="bu">abs</span>(h))  <span class="co"># |valor| para instancias NORMAL</span></span>
+<span id="cb20-18"><a href="#cb20-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-19"><a href="#cb20-19" aria-hidden="true" tabindex="-1"></a>mean_alta   <span class="op">=</span> np.mean(heatmaps_alta,   axis<span class="op">=</span><span class="dv">0</span>) <span class="cf">if</span> heatmaps_alta   <span class="cf">else</span> np.zeros(WINDOW)</span>
+<span id="cb20-20"><a href="#cb20-20" aria-hidden="true" tabindex="-1"></a>mean_normal <span class="op">=</span> np.mean(heatmaps_normal, axis<span class="op">=</span><span class="dv">0</span>) <span class="cf">if</span> heatmaps_normal <span class="cf">else</span> np.zeros(WINDOW)</span>
+<span id="cb20-21"><a href="#cb20-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-22"><a href="#cb20-22" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"  Instancias ALTA analizadas: </span><span class="sc">{</span><span class="bu">len</span>(heatmaps_alta)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb20-23"><a href="#cb20-23" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"  Instancias NORMAL analizadas: </span><span class="sc">{</span><span class="bu">len</span>(heatmaps_normal)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb20-24"><a href="#cb20-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-25"><a href="#cb20-25" aria-hidden="true" tabindex="-1"></a><span class="co"># Visualización</span></span>
+<span id="cb20-26"><a href="#cb20-26" aria-hidden="true" tabindex="-1"></a>lag_labels <span class="op">=</span> [<span class="ss">f't-</span><span class="sc">{</span>WINDOW<span class="op">-</span>i<span class="sc">}</span><span class="ss">'</span> <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(WINDOW)]</span>
+<span id="cb20-27"><a href="#cb20-27" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> np.arange(WINDOW)</span>
+<span id="cb20-28"><a href="#cb20-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-29"><a href="#cb20-29" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">2</span>, figsize<span class="op">=</span>(<span class="dv">15</span>, <span class="dv">5</span>))</span>
+<span id="cb20-30"><a href="#cb20-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-31"><a href="#cb20-31" aria-hidden="true" tabindex="-1"></a>ax1 <span class="op">=</span> axes[<span class="dv">0</span>]</span>
+<span id="cb20-32"><a href="#cb20-32" aria-hidden="true" tabindex="-1"></a>ax1.bar(x, mean_alta, color<span class="op">=</span>plt.cm.Reds(np.linspace(<span class="fl">0.4</span>, <span class="fl">0.9</span>, WINDOW)))</span>
+<span id="cb20-33"><a href="#cb20-33" aria-hidden="true" tabindex="-1"></a>ax1.set_xticks(x)<span class="op">;</span> ax1.set_xticklabels(lag_labels, rotation<span class="op">=</span><span class="dv">45</span>, fontsize<span class="op">=</span><span class="dv">8</span>)</span>
+<span id="cb20-34"><a href="#cb20-34" aria-hidden="true" tabindex="-1"></a>ax1.set_title(<span class="st">'Importancia LEFTIST media — días predichos como ALTA demanda'</span>,</span>
+<span id="cb20-35"><a href="#cb20-35" aria-hidden="true" tabindex="-1"></a>              fontsize<span class="op">=</span><span class="dv">11</span>)</span>
+<span id="cb20-36"><a href="#cb20-36" aria-hidden="true" tabindex="-1"></a>ax1.set_ylabel(<span class="st">'Peso LEFTIST medio (contribución positiva)'</span>)</span>
+<span id="cb20-37"><a href="#cb20-37" aria-hidden="true" tabindex="-1"></a>ax1.axhline(<span class="dv">0</span>, color<span class="op">=</span><span class="st">'black'</span>, lw<span class="op">=</span><span class="fl">0.8</span>)</span>
+<span id="cb20-38"><a href="#cb20-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-39"><a href="#cb20-39" aria-hidden="true" tabindex="-1"></a>ax2 <span class="op">=</span> axes[<span class="dv">1</span>]</span>
+<span id="cb20-40"><a href="#cb20-40" aria-hidden="true" tabindex="-1"></a>ax2.bar(x, mean_normal, color<span class="op">=</span>plt.cm.Blues(np.linspace(<span class="fl">0.4</span>, <span class="fl">0.9</span>, WINDOW)))</span>
+<span id="cb20-41"><a href="#cb20-41" aria-hidden="true" tabindex="-1"></a>ax2.set_xticks(x)<span class="op">;</span> ax2.set_xticklabels(lag_labels, rotation<span class="op">=</span><span class="dv">45</span>, fontsize<span class="op">=</span><span class="dv">8</span>)</span>
+<span id="cb20-42"><a href="#cb20-42" aria-hidden="true" tabindex="-1"></a>ax2.set_title(<span class="st">'Importancia LEFTIST media — días predichos como NORMAL'</span>,</span>
+<span id="cb20-43"><a href="#cb20-43" aria-hidden="true" tabindex="-1"></a>              fontsize<span class="op">=</span><span class="dv">11</span>)</span>
+<span id="cb20-44"><a href="#cb20-44" aria-hidden="true" tabindex="-1"></a>ax2.set_ylabel(<span class="st">'|Peso LEFTIST| medio (magnitud de influencia)'</span>)</span>
+<span id="cb20-45"><a href="#cb20-45" aria-hidden="true" tabindex="-1"></a>ax2.axhline(<span class="dv">0</span>, color<span class="op">=</span><span class="st">'black'</span>, lw<span class="op">=</span><span class="fl">0.8</span>)</span>
+<span id="cb20-46"><a href="#cb20-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-47"><a href="#cb20-47" aria-hidden="true" tabindex="-1"></a>plt.suptitle(<span class="st">'Importancia temporal global: ¿qué posición en la ventana de 14 días importa más?'</span>,</span>
+<span id="cb20-48"><a href="#cb20-48" aria-hidden="true" tabindex="-1"></a>             fontsize<span class="op">=</span><span class="dv">12</span>)</span>
+<span id="cb20-49"><a href="#cb20-49" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb20-50"><a href="#cb20-50" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">'figuras/05_leftist_global.png'</span>, dpi<span class="op">=</span><span class="dv">150</span>, bbox_inches<span class="op">=</span><span class="st">'tight'</span>)</span>
+<span id="cb20-51"><a href="#cb20-51" aria-hidden="true" tabindex="-1"></a>plt.show()</span>
+<span id="cb20-52"><a href="#cb20-52" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-53"><a href="#cb20-53" aria-hidden="true" tabindex="-1"></a><span class="co"># Insight</span></span>
+<span id="cb20-54"><a href="#cb20-54" aria-hidden="true" tabindex="-1"></a>top_alta <span class="op">=</span> np.argmax(mean_alta)</span>
+<span id="cb20-55"><a href="#cb20-55" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">En alta demanda, el lag con más peso medio suele ser t-</span><span class="sc">{</span>WINDOW <span class="op">-</span> top_alta<span class="sc">}</span><span class="ss">."</span>)</span>
+<span id="cb20-56"><a href="#cb20-56" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-57"><a href="#cb20-57" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Instancias correctamente clasificadas en test: 51
+  Instancias ALTA analizadas: 21
+  Instancias NORMAL analizadas: 30</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="capitulo_files/figure-html/cell-11-output-2.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Insight: para días ALTA, el timestep más influyente es t-2
+→ Los días más recientes en la ventana tienen mayor peso en predecir alta demanda.</code></pre>
+</div>
+</div>
+<p>La figura 5 promedia LEFTIST en los aciertos del test. Para predicciones de alta (izquierda), pesan sobre todo t-1 a t-4: lo que pasó esta semana y la anterior corta condiciona mucho el siguiente día. En normales (derecha) el patrón es más plano, pero también gana importancia hacia el final de la ventana. Encaja con que la serie tenga memoria corta y ciclo semanal.</p>
+<p>En los días etiquetados como alta, el lag que más repite es t-2.</p>
+</section>
+<section id="contrafactuales-nun-cf" class="level3" data-number="6.8.4">
+<h3 data-number="6.8.4" class="anchored" data-anchor-id="contrafactuales-nun-cf"><span class="header-section-number">6.8.4</span> 6.3 Contrafactuales NUN-CF</h3>
+<p>Dado un caso predicho como alta, buscamos en train la ventana etiquetada normal más cercana en distancia euclídea. Esa ventana es el «pasado alternativo» más parecido que llevaría a la otra clase según el vecino guardado en entrenamiento.</p>
+<div id="fed7d2c0" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2026-05-20T16:03:56.423508Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-05-20T16:03:56.423437Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-05-20T16:03:57.096837Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-05-20T16:03:57.096341Z&quot;}}" data-outputid="1220d480-b2ac-4536-8027-6be0c73d206e" data-execution_count="11">
+<details class="code-fold">
+<summary>Código</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> nun_cf(X_train_2d, y_train, instance_2d, predicted_class):</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Nearest Unlike Neighbor Counterfactual."""</span></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>    opposite_class <span class="op">=</span> <span class="dv">1</span> <span class="op">-</span> predicted_class</span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>    mask           <span class="op">=</span> y_train <span class="op">==</span> opposite_class</span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>    opposite_X     <span class="op">=</span> X_train_2d[mask]</span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>    dists <span class="op">=</span> euclidean_distances(instance_2d.reshape(<span class="dv">1</span>, <span class="op">-</span><span class="dv">1</span>), opposite_X)</span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>    best  <span class="op">=</span> np.argmin(dists)</span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> opposite_X[best], opposite_class</span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> plot_nun_cf(ax, original, counterfactual, pred_orig, pred_cf,</span>
+<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a>                window<span class="op">=</span><span class="dv">14</span>, threshold<span class="op">=</span>THRESHOLD):</span>
+<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Visualiza original vs contrafactual."""</span></span>
+<span id="cb23-13"><a href="#cb23-13" aria-hidden="true" tabindex="-1"></a>    t      <span class="op">=</span> np.arange(window)</span>
+<span id="cb23-14"><a href="#cb23-14" aria-hidden="true" tabindex="-1"></a>    labels <span class="op">=</span> [<span class="ss">f't-</span><span class="sc">{</span>window<span class="op">-</span>i<span class="sc">}</span><span class="ss">'</span> <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(window)]</span>
+<span id="cb23-15"><a href="#cb23-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-16"><a href="#cb23-16" aria-hidden="true" tabindex="-1"></a>    ax.plot(t, original,      <span class="st">'o-'</span>, color<span class="op">=</span><span class="st">'tomato'</span>,    lw<span class="op">=</span><span class="dv">2</span>, ms<span class="op">=</span><span class="dv">5</span>, label<span class="op">=</span><span class="ss">f'Original (pred=</span><span class="sc">{</span><span class="st">"ALTA"</span> <span class="cf">if</span> pred_orig<span class="op">==</span><span class="dv">1</span> <span class="cf">else</span> <span class="st">"NORMAL"</span><span class="sc">}</span><span class="ss">)'</span>)</span>
+<span id="cb23-17"><a href="#cb23-17" aria-hidden="true" tabindex="-1"></a>    ax.plot(t, counterfactual,<span class="st">'s--'</span>,color<span class="op">=</span><span class="st">'steelblue'</span>, lw<span class="op">=</span><span class="dv">2</span>, ms<span class="op">=</span><span class="dv">5</span>, label<span class="op">=</span><span class="ss">f'Contrafactual (pred=</span><span class="sc">{</span><span class="st">"ALTA"</span> <span class="cf">if</span> pred_cf<span class="op">==</span><span class="dv">1</span> <span class="cf">else</span> <span class="st">"NORMAL"</span><span class="sc">}</span><span class="ss">)'</span>)</span>
+<span id="cb23-18"><a href="#cb23-18" aria-hidden="true" tabindex="-1"></a>    ax.fill_between(t, original, counterfactual, alpha<span class="op">=</span><span class="fl">0.15</span>, color<span class="op">=</span><span class="st">'grey'</span>, label<span class="op">=</span><span class="st">'Diferencia'</span>)</span>
+<span id="cb23-19"><a href="#cb23-19" aria-hidden="true" tabindex="-1"></a>    ax.axhline(threshold, color<span class="op">=</span><span class="st">'black'</span>, ls<span class="op">=</span><span class="st">':'</span>, lw<span class="op">=</span><span class="dv">1</span>, label<span class="op">=</span><span class="ss">f'Umbral=</span><span class="sc">{</span>threshold<span class="sc">:.0f}</span><span class="ss">'</span>)</span>
+<span id="cb23-20"><a href="#cb23-20" aria-hidden="true" tabindex="-1"></a>    ax.set_xticks(t)<span class="op">;</span> ax.set_xticklabels(labels, rotation<span class="op">=</span><span class="dv">45</span>, fontsize<span class="op">=</span><span class="dv">8</span>)</span>
+<span id="cb23-21"><a href="#cb23-21" aria-hidden="true" tabindex="-1"></a>    ax.set_ylabel(<span class="st">'Pedidos/día'</span>)<span class="op">;</span> ax.legend(fontsize<span class="op">=</span><span class="dv">9</span>)</span>
+<span id="cb23-22"><a href="#cb23-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-23"><a href="#cb23-23" aria-hidden="true" tabindex="-1"></a>    delta <span class="op">=</span> counterfactual <span class="op">-</span> original</span>
+<span id="cb23-24"><a href="#cb23-24" aria-hidden="true" tabindex="-1"></a>    max_change_idx <span class="op">=</span> np.argmax(np.<span class="bu">abs</span>(delta))</span>
+<span id="cb23-25"><a href="#cb23-25" aria-hidden="true" tabindex="-1"></a>    ax.annotate(<span class="ss">f'Mayor cambio</span><span class="ch">\n</span><span class="ss">t-</span><span class="sc">{</span>window<span class="op">-</span>max_change_idx<span class="sc">}</span><span class="ch">\n</span><span class="ss">(</span><span class="sc">{</span>delta[max_change_idx]<span class="sc">:+.0f}</span><span class="ss">)'</span>,</span>
+<span id="cb23-26"><a href="#cb23-26" aria-hidden="true" tabindex="-1"></a>                xy<span class="op">=</span>(max_change_idx, counterfactual[max_change_idx]),</span>
+<span id="cb23-27"><a href="#cb23-27" aria-hidden="true" tabindex="-1"></a>                xytext<span class="op">=</span>(max_change_idx <span class="op">+</span> <span class="fl">1.5</span>, counterfactual[max_change_idx] <span class="op">+</span> <span class="dv">5</span>),</span>
+<span id="cb23-28"><a href="#cb23-28" aria-hidden="true" tabindex="-1"></a>                arrowprops<span class="op">=</span><span class="bu">dict</span>(arrowstyle<span class="op">=</span><span class="st">'-&gt;'</span>, color<span class="op">=</span><span class="st">'darkgreen'</span>, lw<span class="op">=</span><span class="fl">1.5</span>),</span>
+<span id="cb23-29"><a href="#cb23-29" aria-hidden="true" tabindex="-1"></a>                color<span class="op">=</span><span class="st">'darkgreen'</span>, fontsize<span class="op">=</span><span class="dv">9</span>)</span>
+<span id="cb23-30"><a href="#cb23-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-31"><a href="#cb23-31" aria-hidden="true" tabindex="-1"></a><span class="co"># Analizar 4 contrafactuales</span></span>
+<span id="cb23-32"><a href="#cb23-32" aria-hidden="true" tabindex="-1"></a>casos_cf  <span class="op">=</span> <span class="bu">list</span>(np.where((y_pred <span class="op">==</span> <span class="dv">1</span>) <span class="op">&amp;</span> (y_test <span class="op">==</span> <span class="dv">1</span>))[<span class="dv">0</span>][:<span class="dv">4</span>])</span>
+<span id="cb23-33"><a href="#cb23-33" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">2</span>, <span class="dv">2</span>, figsize<span class="op">=</span>(<span class="dv">16</span>, <span class="dv">9</span>))</span>
+<span id="cb23-34"><a href="#cb23-34" aria-hidden="true" tabindex="-1"></a>axes <span class="op">=</span> axes.flatten()</span>
+<span id="cb23-35"><a href="#cb23-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-36"><a href="#cb23-36" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> ax, idx <span class="kw">in</span> <span class="bu">zip</span>(axes, casos_cf):</span>
+<span id="cb23-37"><a href="#cb23-37" aria-hidden="true" tabindex="-1"></a>    inst   <span class="op">=</span> X_test_2d[idx]</span>
+<span id="cb23-38"><a href="#cb23-38" aria-hidden="true" tabindex="-1"></a>    pc     <span class="op">=</span> <span class="bu">int</span>(y_pred[idx])</span>
+<span id="cb23-39"><a href="#cb23-39" aria-hidden="true" tabindex="-1"></a>    cf, cf_class <span class="op">=</span> nun_cf(X_train_2d, y_train, inst, pc)</span>
+<span id="cb23-40"><a href="#cb23-40" aria-hidden="true" tabindex="-1"></a>    cf_pred      <span class="op">=</span> <span class="bu">int</span>(clf.predict(cf.reshape(<span class="dv">1</span>, <span class="op">-</span><span class="dv">1</span>))[<span class="dv">0</span>])</span>
+<span id="cb23-41"><a href="#cb23-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-42"><a href="#cb23-42" aria-hidden="true" tabindex="-1"></a>    plot_nun_cf(ax, inst, cf, pc, cf_class)</span>
+<span id="cb23-43"><a href="#cb23-43" aria-hidden="true" tabindex="-1"></a>    ax.set_title(<span class="ss">f'Caso </span><span class="sc">{</span>idx<span class="sc">}</span><span class="ss"> — ALTA→NORMAL</span><span class="ch">\n</span><span class="ss">Dif. media: </span><span class="sc">{</span>(cf<span class="op">-</span>inst)<span class="sc">.</span>mean()<span class="sc">:.1f}</span><span class="ss"> pedidos/día'</span>,</span>
+<span id="cb23-44"><a href="#cb23-44" aria-hidden="true" tabindex="-1"></a>                 fontsize<span class="op">=</span><span class="dv">10</span>)</span>
+<span id="cb23-45"><a href="#cb23-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-46"><a href="#cb23-46" aria-hidden="true" tabindex="-1"></a>plt.suptitle(<span class="st">'NUN-CF: contrafactuales más cercanos de clase opuesta</span><span class="ch">\n</span><span class="st">'</span></span>
+<span id="cb23-47"><a href="#cb23-47" aria-hidden="true" tabindex="-1"></a>             <span class="st">'"¿Cómo debería haber sido el pasado para predecir NORMAL?"'</span>,</span>
+<span id="cb23-48"><a href="#cb23-48" aria-hidden="true" tabindex="-1"></a>             fontsize<span class="op">=</span><span class="dv">12</span>)</span>
+<span id="cb23-49"><a href="#cb23-49" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb23-50"><a href="#cb23-50" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">'figuras/06_nun_cf.png'</span>, dpi<span class="op">=</span><span class="dv">150</span>, bbox_inches<span class="op">=</span><span class="st">'tight'</span>)</span>
+<span id="cb23-51"><a href="#cb23-51" aria-hidden="true" tabindex="-1"></a>plt.show()</span>
+<span id="cb23-52"><a href="#cb23-52" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-53"><a href="#cb23-53" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="capitulo_files/figure-html/cell-12-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>La figura 6 compara cada caso predicho como alta (línea roja) con el vecino de entrenamiento más parecido pero etiquetado como normal (azul discontinua). La zona gris es la diferencia; la flecha verde marca el día donde más cambia el valor. No hace falta reescribir toda la quincena: a veces bastan uno o dos días distintos para que el modelo cambie de opinión, en la misma línea que LEFTIST marca los lags recientes.</p>
+<div id="f21d24f8" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2026-05-20T16:03:57.098239Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-05-20T16:03:57.098147Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-05-20T16:03:57.102008Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-05-20T16:03:57.101265Z&quot;}}" data-outputid="a684eae8-ae68-4175-cd18-18ceb4587c11" data-execution_count="12">
+<details class="code-fold">
+<summary>Código</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'Contrafactuales NUN-CF — casos alta bien clasificados:'</span>)</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span><span class="st">'idx'</span><span class="sc">:&gt;4}</span><span class="ss"> | </span><span class="sc">{</span><span class="st">'media orig'</span><span class="sc">:&gt;10}</span><span class="ss"> | </span><span class="sc">{</span><span class="st">'media CF'</span><span class="sc">:&gt;8}</span><span class="ss"> | </span><span class="sc">{</span><span class="st">'Δ media'</span><span class="sc">:&gt;8}</span><span class="ss"> | timesteps con más cambio"</span>)</span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'-'</span> <span class="op">*</span> <span class="dv">65</span>)</span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>todos_alta <span class="op">=</span> np.where((y_pred <span class="op">==</span> <span class="dv">1</span>) <span class="op">&amp;</span> (y_test <span class="op">==</span> <span class="dv">1</span>))[<span class="dv">0</span>]</span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> idx <span class="kw">in</span> todos_alta[:<span class="dv">8</span>]:</span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>    inst <span class="op">=</span> X_test_2d[idx]</span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a>    cf, _ <span class="op">=</span> nun_cf(X_train_2d, y_train, inst, <span class="dv">1</span>)</span>
+<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a>    delta <span class="op">=</span> cf <span class="op">-</span> inst</span>
+<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a>    top_change <span class="op">=</span> np.argsort(np.<span class="bu">abs</span>(delta))[<span class="op">-</span><span class="dv">2</span>:][::<span class="op">-</span><span class="dv">1</span>]</span>
+<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a>    dias_key <span class="op">=</span> <span class="st">', '</span>.join([<span class="ss">f't-</span><span class="sc">{</span>WINDOW <span class="op">-</span> d<span class="sc">}</span><span class="ss">'</span> <span class="cf">for</span> d <span class="kw">in</span> top_change])</span>
+<span id="cb24-12"><a href="#cb24-12" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f'</span><span class="sc">{</span>idx<span class="sc">:&gt;4}</span><span class="ss"> | </span><span class="sc">{</span>inst<span class="sc">.</span>mean()<span class="sc">:&gt;10.1f}</span><span class="ss"> | </span><span class="sc">{</span>cf<span class="sc">.</span>mean()<span class="sc">:&gt;8.1f}</span><span class="ss"> | </span><span class="sc">{</span>delta<span class="sc">.</span>mean()<span class="sc">:&gt;+8.1f}</span><span class="ss"> | </span><span class="sc">{</span>dias_key<span class="sc">}</span><span class="ss">'</span>)</span>
+<span id="cb24-13"><a href="#cb24-13" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Contrafactuales NUN-CF — casos alta bien clasificados:
+ idx | media orig | media CF |  Δ media | timesteps con más cambio
+-----------------------------------------------------------------
+   1 |       88.6 |     84.4 |     -4.3 | t-7, t-11
+   2 |       86.1 |     92.9 |     +6.8 | t-7, t-6
+   3 |       86.4 |     87.4 |     +1.0 | t-1, t-8
+   8 |       81.6 |     84.9 |     +3.4 | t-13, t-12
+   9 |       79.6 |     92.9 |    +13.3 | t-14, t-4
+  10 |       83.9 |     87.4 |     +3.5 | t-1, t-5
+  16 |       78.9 |     92.9 |    +14.1 | t-4, t-1
+  17 |       80.1 |     87.4 |     +7.4 | t-1, t-5</code></pre>
+</div>
+</div>
+</section>
+<section id="síntesis" class="level3" data-number="6.8.5">
+<h3 data-number="6.8.5" class="anchored" data-anchor-id="síntesis"><span class="header-section-number">6.8.5</span> 6.4 Síntesis</h3>
+<p>LEFTIST y NUN-CF coinciden en que pesan más los días recientes de la ventana. La clasificación de picos se parece a una racha: varios días altos seguidos empujan la predicción; un día flojo reciente puede bajarla. En NUN-CF los cambios mayores suelen concentrarse en los mismos lags que marca LEFTIST, aunque el vecino contrafactual no siempre implica bajar todos los días recientes.</p>
+</section>
+</section>
+<section id="conclusiones" class="level2" data-number="6.9">
+<h2 data-number="6.9" class="anchored" data-anchor-id="conclusiones"><span class="header-section-number">6.9</span> 7. Conclusiones</h2>
+<p>El Random Forest alcanza unos 85 % de accuracy en el test (recall alta ~0,71). Las explicaciones apuntan a inercia en los últimos dos o cuatro días. Los contrafactuales suelen acercarse a ventanas con menos pedidos en ese tramo reciente.</p>
+<p>Operativamente, sirve como alerta de continuidad de demanda, no como cifra exacta de pedidos.</p>
+<p>Sobre TSInterpret: LEFTIST funciona bien con el patch; los contrafactuales nativos dieron problemas en nuestro entorno y por eso NUN-CF quedó manual.</p>
+<p>Limitaciones: al binarizar se pierde matices entre 89 y 120 pedidos; no hay calendario de feriados ni cortes de luz; el umbral global no se recalcula por sucursal.</p>
+<p>Trabajo futuro: probar LSTM/CNN con NativeGuide, clases baja/media/alta, y estabilidad de las explicaciones si se reentrena el bosque.</p>
+</section>
+<section id="referencias" class="level2" data-number="6.10">
+<h2 data-number="6.10" class="anchored" data-anchor-id="referencias"><span class="header-section-number">6.10</span> 8. Referencias</h2>
+<ul>
+<li>Guillemé, M., et al.&nbsp;(2019). Agnostic local explanation for time series classification. IEEE ICTAI.</li>
+<li>Höllig, J., et al.&nbsp;(2022). TSEvo: Evolutionary Counterfactual Explanations for Time Series Classification. IEEE ICMLA.</li>
+<li>Delaney, E., Greene, D., &amp; Keane, M.T. (2021). Instance-Based Counterfactual Explanations for Time Series Classification. ICCBR.</li>
+<li>Ribeiro, M.T., Singh, S., &amp; Guestrin, C. (2016). “Why Should I Trust You?”: Explaining the Predictions of Any Classifier. KDD.</li>
+<li>Höllig, J. et al.&nbsp;(2023). TSInterpret: A Python Package for the Interpretability of Time Series Classification. SoftwareX.</li>
+<li>Biecek, P., &amp; Burzykowski, T. (2021). Explanatory Model Analysis. Chapman and Hall/CRC.</li>
+<li>Molnar, C. (2022). Interpretable Machine Learning (2nd ed.).</li>
+</ul>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    // Ensure there is a toggle, if there isn't float one in the top right
+    if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+      const a = window.document.createElement('a');
+      a.classList.add('top-right');
+      a.classList.add('quarto-color-scheme-toggle');
+      a.href = "";
+      a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+      const i = window.document.createElement("i");
+      i.classList.add('bi');
+      a.appendChild(i);
+      window.document.body.appendChild(a);
+    }
+    setColorSchemeToggle(hasAlternateSentinel())
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copiado");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copiado");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+    const viewSource = window.document.getElementById('quarto-view-source') ||
+                       window.document.getElementById('quarto-code-tools-source');
+    if (viewSource) {
+      const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+      viewSource.addEventListener("click", function(e) {
+        if (sourceUrl) {
+          // rstudio viewer pane
+          if (/\bcapabilities=\b/.test(window.location)) {
+            window.open(sourceUrl);
+          } else {
+            window.location.href = sourceUrl;
+          }
+        } else {
+          const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+          modal.show();
+        }
+        return false;
+      });
+    }
+    function toggleCodeHandler(show) {
+      return function(e) {
+        const detailsSrc = window.document.querySelectorAll(".cell > details > .sourceCode");
+        for (let i=0; i<detailsSrc.length; i++) {
+          const details = detailsSrc[i].parentElement;
+          if (show) {
+            details.open = true;
+          } else {
+            details.removeAttribute("open");
+          }
+        }
+        const cellCodeDivs = window.document.querySelectorAll(".cell > .sourceCode");
+        const fromCls = show ? "hidden" : "unhidden";
+        const toCls = show ? "unhidden" : "hidden";
+        for (let i=0; i<cellCodeDivs.length; i++) {
+          const codeDiv = cellCodeDivs[i];
+          if (codeDiv.classList.contains(fromCls)) {
+            codeDiv.classList.remove(fromCls);
+            codeDiv.classList.add(toCls);
+          } 
+        }
+        return false;
+      }
+    }
+    const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+    if (hideAllCode) {
+      hideAllCode.addEventListener("click", toggleCodeHandler(false));
+    }
+    const showAllCode = window.document.getElementById("quarto-show-all-code");
+    if (showAllCode) {
+      showAllCode.addEventListener("click", toggleCodeHandler(true));
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../../chapters/emociones/capitulo.html" class="pagination-link" aria-label="Explicabilidad de un modelo de reconocimiento facial de emociones">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Explicabilidad de un modelo de reconocimiento facial de emociones</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../../chapters/xrl/capitulo.html" class="pagination-link" aria-label="Título. Explicabilidad de DRL basada en árboles">
+        <span class="nav-page-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Título. Explicabilidad de DRL basada en árboles</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+<footer class="footer"><div class="nav-footer"><div class="nav-footer-center"><div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.dev/belenda/xai_stories_project/blob/main/chapters/triplek/capitulo.ipynb" class="toc-action"><i class="bi bi-github"></i>Editar esta página</a></li><li><a href="https://github.com/belenda/xai_stories_project/issues/new" class="toc-action"><i class="bi empty"></i>Informar sobre problema</a></li></ul></div></div></div></footer></body></html>

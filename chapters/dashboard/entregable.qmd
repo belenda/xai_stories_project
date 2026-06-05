@@ -1,3 +1,8 @@
+---
+title: Dashboard XAI
+author: Maria Sanchez, David Rivera y Pablo Sanchez
+---
+
 # Explicación y exploración de Datasets mediante lenguaje natural y técnicas de Inteligencia Artificial Explicable
 ## Autores
 **María Sachez Carrasco**
@@ -249,7 +254,9 @@ show_image("2")
 Ejemplo 1. Llamada a la herramienta correspondiente métodos de explicación local 
 
 **Información devuelta tras llamar a la herramienta**  
-_{"shap": {"tipo_dataset": "tabular", "base_value_promedio_dataset": 0.3731, "prediccion_final_modelo": 0.88, "top_5_variables_impacto": {"bac": 0.4985094333436396, "n_drinks": 0.10080575098716064, "weight_kg": -0.04756011464649577, "gender": -0.03449046595582091, "age": -0.024377096525498968}, "plot_path": "plots\\shap_local_waterfall_190015fd.png"}, "lime": {"tipo_dataset": "tabular", "prediccion_modelo": 0.88, "top_5_variables_impacto": {"-0.21 < bac <= 0.55": 0.1646, "n_drinks > 0.86": 0.0998, "weight_kg > 0.67": -0.035, "age > 0.78": 0.0184, "-0.00 < stomach_content <= 1.28": 0.0092}, "plot_path": "plots\\lime_local_49769d54.png"}, "anchor": {"prediccion_modelo": 0.88, "reglas_ancla": ["bac > -0.21", "drink_duration_h > 0.49", "n_drinks > 0.86", "stomach_content > -1.28", "age > 0.78", "weight_kg > 0.67"], "precision": 0.8935, "cobertura": 0.0041}}_  
+```json
+{"shap": {"tipo_dataset": "tabular", "base_value_promedio_dataset": 0.3731, "prediccion_final_modelo": 0.88, "top_5_variables_impacto": {"bac": 0.4985094333436396, "n_drinks": 0.10080575098716064, "weight_kg": -0.04756011464649577, "gender": -0.03449046595582091, "age": -0.024377096525498968}, "plot_path": "plots\\shap_local_waterfall_190015fd.png"}, "lime": {"tipo_dataset": "tabular", "prediccion_modelo": 0.88, "top_5_variables_impacto": {"-0.21 < bac <= 0.55": 0.1646, "n_drinks > 0.86": 0.0998, "weight_kg > 0.67": -0.035, "age > 0.78": 0.0184, "-0.00 < stomach_content <= 1.28": 0.0092}, "plot_path": "plots\\lime_local_49769d54.png"}, "anchor": {"prediccion_modelo": 0.88, "reglas_ancla": ["bac > -0.21", "drink_duration_h > 0.49", "n_drinks > 0.86", "stomach_content > -1.28", "age > 0.78", "weight_kg > 0.67"], "precision": 0.8935, "cobertura": 0.0041}}
+```  
 
 #### Ejemplo 2. El modelo predice correctamente la clase (0) para una instancia concreta
 
@@ -265,7 +272,9 @@ show_image("4")
 Ejemplo 2. Llamada a la herramienta correspondiente (métodos de explicación local) 
 
 **Información devuelta tras llamar a la herramienta**  
-_{"shap": {"tipo_dataset": "tabular", "base_value_promedio_dataset": 0.3731, "prediccion_final_modelo": 0.08, "top_5_variables_impacto": {"bac": -0.31946260452238245, "n_drinks": 0.09598096764526115, "weight_kg": -0.042907225284873333, "gender": -0.027536709002630107, "drink_duration_h": 0.02238192026868897}, "plot_path": "plots\\shap_local_waterfall_8f4e997f.png"}, "lime": {"tipo_dataset": "tabular", "prediccion_modelo": 0.08, "top_5_variables_impacto": {"stomach_content > 1.28": -0.2193, "-0.21 < bac <= 0.55": 0.1632, "n_drinks > 0.86": 0.1187, "weight_kg > 0.67": -0.0354, "age > 0.78": -0.027}, "plot_path": "plots\\lime_local_516e4e02.png"}, "anchor": {"prediccion_modelo": 0.08, "reglas_ancla": ["bac <= 0.55", "weight_kg > 0.67", "stomach_content > -0.00", "n_drinks > 0.86", "drink_duration_h > 0.49"], "precision": 0.9577, "cobertura": 0.0029}}_  
+```json
+{"shap": {"tipo_dataset": "tabular", "base_value_promedio_dataset": 0.3731, "prediccion_final_modelo": 0.08, "top_5_variables_impacto": {"bac": -0.31946260452238245, "n_drinks": 0.09598096764526115, "weight_kg": -0.042907225284873333, "gender": -0.027536709002630107, "drink_duration_h": 0.02238192026868897}, "plot_path": "plots\\shap_local_waterfall_8f4e997f.png"}, "lime": {"tipo_dataset": "tabular", "prediccion_modelo": 0.08, "top_5_variables_impacto": {"stomach_content > 1.28": -0.2193, "-0.21 < bac <= 0.55": 0.1632, "n_drinks > 0.86": 0.1187, "weight_kg > 0.67": -0.0354, "age > 0.78": -0.027}, "plot_path": "plots\\lime_local_516e4e02.png"}, "anchor": {"prediccion_modelo": 0.08, "reglas_ancla": ["bac <= 0.55", "weight_kg > 0.67", "stomach_content > -0.00", "n_drinks > 0.86", "drink_duration_h > 0.49"], "precision": 0.9577, "cobertura": 0.0029}}
+```  
 
 #### Ejemplo 3. El modelo explica cómo funciona el modelo en general y cuáles son las variables clave
 
@@ -280,7 +289,9 @@ show_image("6")
 Ejemplo 3. Llamada a la herramienta correspondiente (métodos de explicación global)  
 
 **Información devuelta tras llamar a la herramienta**  
-_{"analisis": "Top 5 variables más importantes a nivel global", "base_value_promedio_dataset": 0.3731, "variables": {"bac": {"importancia_media_absoluta": 0.365, "direccion_impacto": "Positivo (A mayor valor de la variable, mayor es la predicción)"}, "n_drinks": {"importancia_media_absoluta": 0.0602, "direccion_impacto": "Positivo (A mayor valor de la variable, mayor es la predicción)"}, "gender": {"importancia_media_absoluta": 0.0345, "direccion_impacto": "Negativo (A mayor valor de la variable, menor es la predicción)"}, "weight_kg": {"importancia_media_absoluta": 0.0263, "direccion_impacto": "Negativo (A mayor valor de la variable, menor es la predicción)"}, "drink_duration_h": {"importancia_media_absoluta": 0.0209, "direccion_impacto": "Positivo (A mayor valor de la variable, mayor es la predicción)"}}, "plot_path": "plots\\shap_global_bar_de2ed7df.png"}_  
+```json
+{"analisis": "Top 5 variables más importantes a nivel global", "base_value_promedio_dataset": 0.3731, "variables": {"bac": {"importancia_media_absoluta": 0.365, "direccion_impacto": "Positivo (A mayor valor de la variable, mayor es la predicción)"}, "n_drinks": {"importancia_media_absoluta": 0.0602, "direccion_impacto": "Positivo (A mayor valor de la variable, mayor es la predicción)"}, "gender": {"importancia_media_absoluta": 0.0345, "direccion_impacto": "Negativo (A mayor valor de la variable, menor es la predicción)"}, "weight_kg": {"importancia_media_absoluta": 0.0263, "direccion_impacto": "Negativo (A mayor valor de la variable, menor es la predicción)"}, "drink_duration_h": {"importancia_media_absoluta": 0.0209, "direccion_impacto": "Positivo (A mayor valor de la variable, mayor es la predicción)"}}, "plot_path": "plots\\shap_global_bar_de2ed7df.png"}
+```  
 
 
 #### Ejemplo 4. El modelo explica cómo cambiar las variables de una instancia con el objetivo de cambiar la predicción final  

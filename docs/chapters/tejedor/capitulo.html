@@ -1,0 +1,1311 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="es" xml:lang="es"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.38">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>13&nbsp; Evaluación de la robustez de explicaciones en LLMs mediante perturbaciones narrativas – XAI Stories</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<link href="../../chapters/senales_trafico/capitulo.html" rel="next">
+<link href="../../chapters/toxicidad/capitulo.html" rel="prev">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-de63f62b328812d8e578a4d74e282472.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-dark-6b6957c917596b414ec0b78690761e87.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-de63f62b328812d8e578a4d74e282472.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-81de787dd4773dbc0001c2dc1cc3016d.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-dark-21613c26995e5ad49e067cca7f3a46fb.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../../site_libs/bootstrap/bootstrap-81de787dd4773dbc0001c2dc1cc3016d.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No se han encontrado resultados",
+    "search-matching-documents-text": "documentos encontrados",
+    "search-copy-link-title": "Copiar el enlace en la búsqueda",
+    "search-hide-matches-text": "Ocultar resultados adicionales",
+    "search-more-match-text": "resultado adicional en este documento",
+    "search-more-matches-text": "resultados adicionales en este documento",
+    "search-clear-button-title": "Borrar",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancelar",
+    "search-submit-button-title": "Enviar",
+    "search-label": "Buscar"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../../styles.css">
+</head>
+
+<body class="nav-sidebar floating quarto-light"><script id="quarto-html-before-body" type="application/javascript">
+    const toggleBodyColorMode = (bsSheetEl) => {
+      const mode = bsSheetEl.getAttribute("data-mode");
+      const bodyEl = window.document.querySelector("body");
+      if (mode === "dark") {
+        bodyEl.classList.add("quarto-dark");
+        bodyEl.classList.remove("quarto-light");
+      } else {
+        bodyEl.classList.add("quarto-light");
+        bodyEl.classList.remove("quarto-dark");
+      }
+    }
+    const toggleBodyColorPrimary = () => {
+      const bsSheetEl = window.document.querySelector("link#quarto-bootstrap:not([rel=disabled-stylesheet])");
+      if (bsSheetEl) {
+        toggleBodyColorMode(bsSheetEl);
+      }
+    }
+    const setColorSchemeToggle = (alternate) => {
+      const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+      for (let i=0; i < toggles.length; i++) {
+        const toggle = toggles[i];
+        if (toggle) {
+          if (alternate) {
+            toggle.classList.add("alternate");
+          } else {
+            toggle.classList.remove("alternate");
+          }
+        }
+      }
+    };
+    const toggleColorMode = (alternate) => {
+      // Switch the stylesheets
+      const primaryStylesheets = window.document.querySelectorAll('link.quarto-color-scheme:not(.quarto-color-alternate)');
+      const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+      manageTransitions('#quarto-margin-sidebar .nav-link', false);
+      if (alternate) {
+        // note: dark is layered on light, we don't disable primary!
+        enableStylesheet(alternateStylesheets);
+        for (const sheetNode of alternateStylesheets) {
+          if (sheetNode.id === "quarto-bootstrap") {
+            toggleBodyColorMode(sheetNode);
+          }
+        }
+      } else {
+        disableStylesheet(alternateStylesheets);
+        enableStylesheet(primaryStylesheets)
+        toggleBodyColorPrimary();
+      }
+      manageTransitions('#quarto-margin-sidebar .nav-link', true);
+      // Switch the toggles
+      setColorSchemeToggle(alternate)
+      // Hack to workaround the fact that safari doesn't
+      // properly recolor the scrollbar when toggling (#1455)
+      if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+        manageTransitions("body", false);
+        window.scrollTo(0, 1);
+        setTimeout(() => {
+          window.scrollTo(0, 0);
+          manageTransitions("body", true);
+        }, 40);
+      }
+    }
+    const disableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        stylesheet.rel = 'disabled-stylesheet';
+      }
+    }
+    const enableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        if(stylesheet.rel !== 'stylesheet') { // for Chrome, which will still FOUC without this check
+          stylesheet.rel = 'stylesheet';
+        }
+      }
+    }
+    const manageTransitions = (selector, allowTransitions) => {
+      const els = window.document.querySelectorAll(selector);
+      for (let i=0; i < els.length; i++) {
+        const el = els[i];
+        if (allowTransitions) {
+          el.classList.remove('notransition');
+        } else {
+          el.classList.add('notransition');
+        }
+      }
+    }
+    const isFileUrl = () => {
+      return window.location.protocol === 'file:';
+    }
+    const hasAlternateSentinel = () => {
+      let styleSentinel = getColorSchemeSentinel();
+      if (styleSentinel !== null) {
+        return styleSentinel === "alternate";
+      } else {
+        return false;
+      }
+    }
+    const setStyleSentinel = (alternate) => {
+      const value = alternate ? "alternate" : "default";
+      if (!isFileUrl()) {
+        window.localStorage.setItem("quarto-color-scheme", value);
+      } else {
+        localAlternateSentinel = value;
+      }
+    }
+    const getColorSchemeSentinel = () => {
+      if (!isFileUrl()) {
+        const storageValue = window.localStorage.getItem("quarto-color-scheme");
+        return storageValue != null ? storageValue : localAlternateSentinel;
+      } else {
+        return localAlternateSentinel;
+      }
+    }
+    const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+      const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+      const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+      let newTheme = '';
+      if(authorPrefersDark) {
+        newTheme = isAlternate ? baseTheme : alternateTheme;
+      } else {
+        newTheme = isAlternate ? alternateTheme : baseTheme;
+      }
+      const changeGiscusTheme = () => {
+        // From: https://github.com/giscus/giscus/issues/336
+        const sendMessage = (message) => {
+          const iframe = document.querySelector('iframe.giscus-frame');
+          if (!iframe) return;
+          iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+        }
+        sendMessage({
+          setConfig: {
+            theme: newTheme
+          }
+        });
+      }
+      const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+      if (isGiscussLoaded) {
+        changeGiscusTheme();
+      }
+    };
+    const authorPrefersDark = false;
+    const darkModeDefault = authorPrefersDark;
+      document.querySelector('link#quarto-text-highlighting-styles.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+      document.querySelector('link#quarto-bootstrap.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+    let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+    // Dark / light mode switch
+    window.quartoToggleColorScheme = () => {
+      // Read the current dark / light value
+      let toAlternate = !hasAlternateSentinel();
+      toggleColorMode(toAlternate);
+      setStyleSentinel(toAlternate);
+      toggleGiscusIfUsed(toAlternate, darkModeDefault);
+      window.dispatchEvent(new Event('resize'));
+    };
+    // Switch to dark mode if need be
+    if (hasAlternateSentinel()) {
+      toggleColorMode(true);
+    } else {
+      toggleColorMode(false);
+    }
+  </script>
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Alternar barra lateral" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../chapters/toxicidad/capitulo.html">Texto e IA generativa</a></li><li class="breadcrumb-item"><a href="../../chapters/tejedor/capitulo.html"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Evaluación de la robustez de explicaciones en LLMs mediante perturbaciones narrativas</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Alternar barra lateral" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Buscar" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../../">XAI Stories</a> 
+        <div class="sidebar-tools-main tools-wide">
+    <a href="https://github.com/belenda/xai_stories_project" title="Ejecutar el código" class="quarto-navigation-tool px-1" aria-label="Ejecutar el código"><i class="bi bi-github"></i></a>
+    <div class="dropdown">
+      <a href="" title="Compartir" id="quarto-navigation-tool-dropdown-0" class="quarto-navigation-tool dropdown-toggle px-1" data-bs-toggle="dropdown" aria-expanded="false" role="link" aria-label="Compartir"><i class="bi bi-share"></i></a>
+      <ul class="dropdown-menu" aria-labelledby="quarto-navigation-tool-dropdown-0">
+          <li>
+            <a class="dropdown-item sidebar-tools-main-item" href="https://twitter.com/intent/tweet?url=|url|">
+              <i class="bi bi-twitter pe-1"></i>
+            Twitter
+            </a>
+          </li>
+          <li>
+            <a class="dropdown-item sidebar-tools-main-item" href="https://www.linkedin.com/sharing/share-offsite/?url=|url|">
+              <i class="bi bi-linkedin pe-1"></i>
+            LinkedIn
+            </a>
+          </li>
+      </ul>
+    </div>
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Alternar modo oscuro"><i class="bi"></i></a>
+</div>
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Buscar"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Prefacio</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../foreword.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Prólogo</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Nuevos métodos y propuestas</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/lime_ga/capitulo.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">LIME-GA: Generación de vecindarios realistas y diversos para LIME mediante un algoritmo genético multiobjetivo</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/adversarios_lime_shap/capitulo.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Explorando las limitaciones de métodos de explicabilidad LIME y SHAP</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Imagen médica y señales</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/alzheimer/capitulo.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Explicabilidad sobre EfficientNet3D binario (CN vs AD)</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/ecg/capitulo.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">¿Sabe el modelo dónde mirar?</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/emociones/capitulo.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Explicabilidad de un modelo de reconocimiento facial de emociones</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">Series temporales</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/triplek/capitulo.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Clasificación y explicabilidad temporal de la demanda en restaurantes con TSInterpret</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/xrl/capitulo.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Título. Explicabilidad de DRL basada en árboles</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true">
+ <span class="menu-text">Datos tabulares</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/admision_ucm/capitulo.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">¿A quién favorece la nota de acceso? Equidad y explicabilidad en el sistema de admisión universitaria.</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/inversiones/capitulo.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Explainable AI (XAI) aplicada a un problema principal-agente en gestión de inversiones</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/rotacion_laboral/capitulo.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Explicabilidad con LIME y SHAP en la predicción de rotación laboral</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/sueno/capitulo.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title"><strong>Identificación y clasificación de las etapas del sueño mediante dispositivos wearables</strong></span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true">
+ <span class="menu-text">Texto e IA generativa</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/toxicidad/capitulo.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">¿Podemos confiar en las explicaciones de los detectores de lenguaje tóxico?</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/tejedor/capitulo.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Evaluación de la robustez de explicaciones en LLMs mediante perturbaciones narrativas</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true">
+ <span class="menu-text">Visión por computador</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/senales_trafico/capitulo.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Explicabilidad de redes neuronales para señales de tráfico</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/cnn_vae/capitulo.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">1. Introducción y preprocesamiento de datos</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" role="navigation" aria-expanded="true">
+ <span class="menu-text">Sistemas e interfaces</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" role="navigation" aria-expanded="true" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-7" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/dashboard/capitulo.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Explicación y exploración de Datasets mediante lenguaje natural y técnicas de Inteligencia Artificial Explicable</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../acknowledgements.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Agradecimientos</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../references.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Referencias</span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Tabla de contenidos</h2>
+   
+  <ul>
+  <li><a href="#autora" id="toc-autora" class="nav-link active" data-scroll-target="#autora"><span class="header-section-number">13.1</span> Autora</a></li>
+  <li><a href="#resumen" id="toc-resumen" class="nav-link" data-scroll-target="#resumen"><span class="header-section-number">14</span> Resumen</a></li>
+  <li><a href="#introducción" id="toc-introducción" class="nav-link" data-scroll-target="#introducción"><span class="header-section-number">15</span> 1. Introducción</a></li>
+  <li><a href="#datos" id="toc-datos" class="nav-link" data-scroll-target="#datos"><span class="header-section-number">16</span> 2. Datos</a></li>
+  <li><a href="#modelos" id="toc-modelos" class="nav-link" data-scroll-target="#modelos"><span class="header-section-number">17</span> 3. Modelos</a></li>
+  <li><a href="#explicaciones" id="toc-explicaciones" class="nav-link" data-scroll-target="#explicaciones"><span class="header-section-number">18</span> 4. Explicaciones</a>
+  <ul class="collapse">
+  <li><a href="#pipeline-completo" id="toc-pipeline-completo" class="nav-link" data-scroll-target="#pipeline-completo"><span class="header-section-number">18.1</span> 4.1. Pipeline completo</a></li>
+  <li><a href="#funciones-de-perturbación" id="toc-funciones-de-perturbación" class="nav-link" data-scroll-target="#funciones-de-perturbación"><span class="header-section-number">18.2</span> 4.2. Funciones de perturbación</a></li>
+  <li><a href="#evaluación-perturbation-sensitivity-score-pss" id="toc-evaluación-perturbation-sensitivity-score-pss" class="nav-link" data-scroll-target="#evaluación-perturbation-sensitivity-score-pss"><span class="header-section-number">18.3</span> 4.3. Evaluación: Perturbation Sensitivity Score (PSS)</a></li>
+  </ul></li>
+  <li><a href="#resultados-de-los-experimentos" id="toc-resultados-de-los-experimentos" class="nav-link" data-scroll-target="#resultados-de-los-experimentos"><span class="header-section-number">19</span> 5. Resultados de los experimentos</a>
+  <ul class="collapse">
+  <li><a href="#análisis-cualitativo" id="toc-análisis-cualitativo" class="nav-link" data-scroll-target="#análisis-cualitativo"><span class="header-section-number">19.1</span> 5.1. Análisis cualitativo</a></li>
+  </ul></li>
+  <li><a href="#conexión-con-xai-clásica" id="toc-conexión-con-xai-clásica" class="nav-link" data-scroll-target="#conexión-con-xai-clásica"><span class="header-section-number">20</span> 6. Conexión con XAI clásica</a></li>
+  <li><a href="#limitaciones" id="toc-limitaciones" class="nav-link" data-scroll-target="#limitaciones"><span class="header-section-number">21</span> 7. Limitaciones</a></li>
+  <li><a href="#consideraciones-sobre-el-diseño-del-prompt-y-el-formato-de-salida" id="toc-consideraciones-sobre-el-diseño-del-prompt-y-el-formato-de-salida" class="nav-link" data-scroll-target="#consideraciones-sobre-el-diseño-del-prompt-y-el-formato-de-salida"><span class="header-section-number">22</span> 8. Consideraciones sobre el diseño del prompt y el formato de salida</a></li>
+  <li><a href="#conclusiones" id="toc-conclusiones" class="nav-link" data-scroll-target="#conclusiones"><span class="header-section-number">23</span> 9. Conclusiones</a></li>
+  <li><a href="#referencias" id="toc-referencias" class="nav-link" data-scroll-target="#referencias"><span class="header-section-number">24</span> 10. Referencias</a></li>
+  </ul>
+<div class="toc-actions"><ul><li><a href="https://github.dev/belenda/xai_stories_project/blob/main/chapters/tejedor/capitulo.ipynb" class="toc-action"><i class="bi bi-github"></i>Editar esta página</a></li><li><a href="https://github.com/belenda/xai_stories_project/issues/new" class="toc-action"><i class="bi empty"></i>Informar sobre problema</a></li></ul></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../chapters/toxicidad/capitulo.html">Texto e IA generativa</a></li><li class="breadcrumb-item"><a href="../../chapters/tejedor/capitulo.html"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Evaluación de la robustez de explicaciones en LLMs mediante perturbaciones narrativas</span></a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Evaluación de la robustez de explicaciones en LLMs mediante perturbaciones narrativas</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="autora" class="level2" data-number="13.1">
+<h2 data-number="13.1" class="anchored" data-anchor-id="autora"><span class="header-section-number">13.1</span> Autora</h2>
+<p>Isabel Tejedor Burón</p>
+<hr>
+</section>
+<section id="resumen" class="level1" data-number="14">
+<h1 data-number="14"><span class="header-section-number">14</span> Resumen</h1>
+<p>Este proyecto presenta un estudio experimental de Inteligencia Artificial Explicable (XAI) aplicado a modelos de lenguaje grandes (LLMs), analizando la robustez de sus explicaciones mediante perturbaciones controladas del input narrativo.</p>
+<p>A diferencia de XAI tradicional, este proyecto no evalúa un modelo predictivo, sino que estudia al LLM como generador de explicaciones sobre historias narrativas, lo que convierte así, a la explicación como el punto principal de análisis.</p>
+<p>Para realizar este proyecto se ha construido un pipeline experimental que incluye adquisición de datos, análisis exploratorio, representación semántica mediante embeddings, generación de explicaciones con LLaMA 3 8B y evaluación mediante perturbaciones controladas.</p>
+<p>Por último, se mide la estabilidad de las explicaciones mediante el Perturbation Sensitivity Score (PSS), basado en la similitud del coseno entre embeddings de las explicaciones. Los resultados muestran una alta estabilidad frente a perturbaciones lingüísticas, pero una sensibilidad a cambios temporales y estructurales.</p>
+</section>
+<section id="introducción" class="level1" data-number="15">
+<h1 data-number="15"><span class="header-section-number">15</span> 1. Introducción</h1>
+<p>La XAI clásica tiene como objetivo explicar las decisiones de los modelos predictivos mediante la atribución de importancia a las variables de salida. Sin embargo, en la IA generativa, las explicaciones en lenguaje natural no necesariamente muestran los procesos causales internos, sino que pueden ser racionalizaciones plausibles del input.</p>
+<p>En este proyecto, en lugar de explicar predicciones, se analiza la robustez de las explicaciones generadas por un LLM bajo perturbaciones controladas del input narrativo. El objetivo es estudiar la consistencia de las explicaciones como objeto en si mismo.</p>
+<p>Este proyecto se apoya en los conceptos de la asignatura de Técnicas de IA Explicable, especialmente en la estabilidad de explicaciones bajo perturbaciones y su relación con la fidelidad. En este caso, la fidelidad se define respecto a la consistencia del contenido explicativo generado por el LLM.</p>
+</section>
+<section id="datos" class="level1" data-number="16">
+<h1 data-number="16"><span class="header-section-number">16</span> 2. Datos</h1>
+<p>Se utiliza el dataset <em>1000 stories - 100 genres (Kaggle)</em>. Las historias se descargan y se almacenan en data/raw para garantizar reproducibilidad.</p>
+<p>El dataset contiene aproximadamente 99 géneros con distribución equilibrada, lo que permite alta diversidad narrativa.</p>
+<p>Se realiza un muestreo de 3 historias por género (297 en total). Debido a restricciones computacionales, los experimentos finales se realizan sobre 10 historias representativas.</p>
+</section>
+<section id="modelos" class="level1" data-number="17">
+<h1 data-number="17"><span class="header-section-number">17</span> 3. Modelos</h1>
+<p>Se utiliza LLaMA 3 8B como sistema de generación de explicaciones <em>(LLM-as-explainer)</em>. Cada historia se transforma en una estructura JSON. \1</p>
+<pre><code>{
+  "characters": "...", # **En términos de XAI, este componente permite evaluar la fidelidad a nivel de entidades.**
+  "events": "...", # **En términos de XAI, este componente permite estudiar la selección de información en el proceso de explicación**
+  "causal_relations": "...", # **En XAI, esta relacionado con: perturbation-based analysis, counterfactual reasoning, rationalization problem; permite evaluar el grado de comprensión causal del modelo.**
+  "narrative_structure": "..." # **En XAI permite evaluar coherencia global de la explicación, estabilidad del razonamiento ante variaciones del input, consistencia entre múltiples generaciones**
+}</code></pre>
+<p>El modelo se controla mediante prompting estructurado (system + user prompt), lo que restringe inferencias no presentes en el texto y fuerza salida en JSON.</p>
+<p>El modelo se ejecuta con temperatura 0 para garantizar una estabilidad entre generaciones.</p>
+<p>Para la representación semántica se utiliza SentenceTransformers (all-MiniLM-L6-v2), generando embeddings de historias y explicaciones.</p>
+</section>
+<section id="explicaciones" class="level1" data-number="18">
+<h1 data-number="18"><span class="header-section-number">18</span> 4. Explicaciones</h1>
+<section id="pipeline-completo" class="level2" data-number="18.1">
+<h2 data-number="18.1" class="anchored" data-anchor-id="pipeline-completo"><span class="header-section-number">18.1</span> 4.1. Pipeline completo</h2>
+<p>Este proyecto sigue un pipeline reproducible en seis etapas. \1 1. Etapa 1: carga de datos</p>
+<p>Se utiliza el dataset <em>1000 stories - 100 genres (Kaggle)</em>. Las historias se descargan y se almacenan en data/raw para garantizar reproducibilidad.</p>
+<ol start="2" type="1">
+<li>Etapa 2: análisis exploratorio (EDA)</li>
+</ol>
+<p>Se analiza la estructura del dataset, la distribución de géneros, la longitud de textos y la presencia de patrones narrativos.</p>
+<ol start="3" type="1">
+<li>Etapa 3: muestreo estratificado</li>
+</ol>
+<p>Se construye un subconjunto balanceado de 3 historias por género (297 en total). Debido a restricciones computacionales, los experimentos se realizan sobre 10 historias representativas.</p>
+<ol start="4" type="1">
+<li>Etapa 4: representación semántica</li>
+</ol>
+<p>Se generan embeddings con SentenceTransformers (all-MiniLM-L6-v2) para representar historias en un espacio vectorial.</p>
+<p>Tras ello, se aplica clustering no supervisado con el objetivo de analizar si existen agrupaciones naturales en el espacio semántico, sin utilizar etiquetas de género. Los resultados indican que no existe una estructura clara en el espacio de embeddings, lo que motiva el uso de perturbaciones como herramienta principal de análisis.</p>
+<ol start="5" type="1">
+<li>Etapa 5: generación de explicaciones con LLM</li>
+</ol>
+<p>Se utiliza LLaMA 3 8B como sistema de generación de explicaciones <em>(LLM-as-explainer)</em>. Cada historia se transforma en una estructura JSON.</p>
+<ol start="6" type="1">
+<li>Etapa 6: perturbation-based XAI (evaluación principal)</li>
+</ol>
+<p>Se construye un conjunto de perturbaciones controladas. \1 - Perturbaciones estructurales. \1 - Eliminación de oraciones finales - Shuffle de oraciones - Reverse order - Perturbaciones semánticas. \1 - Eliminación de eventos - Inversión contrafactual - Repetición de eventos - Perturbaciones de entidades. \1 - Colapso de personajes a ENTITY - Reasignación de roles - Perturbaciones lingüísticas. \1 - Paraphrasing - Inverse paraphrasing - Ruido. \1 - Inyección de frases irrelevantes</p>
+</section>
+<section id="funciones-de-perturbación" class="level2" data-number="18.2">
+<h2 data-number="18.2" class="anchored" data-anchor-id="funciones-de-perturbación"><span class="header-section-number">18.2</span> 4.2. Funciones de perturbación</h2>
+<p>Cada perturbación modifica un aspecto específico del input narrativo y permite analizar diferentes dimensiones de robustez en el marco de XAI basado en perturbaciones (inspirado en LIME).</p>
+<ol type="1">
+<li>Eliminación de información
+<ul>
+<li>Elimina las últimas frases de la historia.</li>
+<li>Simula la pérdida de información causal en el desenlace.</li>
+<li>Evalúa si la explicación depende del final de la narrativa.</li>
+<li>PSS alto: el modelo no depende del final de la historia.</li>
+</ul></li>
+<li>Permutación de estructura narrativa
+<ul>
+<li>Desordena aleatoriamente las frases de la historia.</li>
+<li>Rompe la estructura temporal y narrativa original.</li>
+<li>Evalúa la dependencia del modelo respecto al orden de eventos.</li>
+<li>PSS alto: el modelo no depende de la secuencia narrativa ni del orden temporal.</li>
+</ul></li>
+<li>Simplificación de personajes
+<ul>
+<li>Reemplaza todos los personajes por una única entidad genérica.</li>
+<li>Elimina la diferenciación entre personajes.</li>
+<li>Evalúa el nivel de abstracción del razonamiento del modelo.</li>
+<li>PSS alto: el modelo no necesita distinguir entre personajes para razonar.</li>
+</ul></li>
+<li>Cambio de roles
+<ul>
+<li>Reasigna aleatoriamente los nombres de los personajes dentro de la historia.</li>
+<li>Mantiene eventos y estructura, pero altera quién realiza cada acción.</li>
+<li>Evalúa si el modelo depende de la identidad de los personajes.</li>
+<li>PSS alto: el modelo no depende de la identidad de los personajes.</li>
+</ul></li>
+<li>Plot twist / cambio contrafactual
+<ul>
+<li>Modifica el final de la historia invirtiendo el resultado.</li>
+<li>Crea un escenario contrafactual.</li>
+<li>Evalúa la sensibilidad del modelo al outcome final.</li>
+<li>PSS alto: el modelo no reinterpreta la historia en función del desenlace.</li>
+</ul></li>
+<li>Eliminación de eventos
+<ul>
+<li>Elimina aleatoriamente un porcentaje de eventos de la historia.</li>
+<li>Simula información incompleta.</li>
+<li>Evalúa la robustez del modelo ante pérdida de información.</li>
+<li>PSS alto: el modelo es capaz de mantener estabilidad con información parcial.</li>
+</ul></li>
+<li>Perturbaciones lingüísticas
+<ul>
+<li>Reescritura lingüística
+<ul>
+<li>Sustituye conectores por sinónimos equivalentes.</li>
+<li>Mantiene el significado del texto.</li>
+<li>Evalúa sensibilidad ante variaciones del lenguaje.</li>
+<li>PSS alto: el modelo no depende de variaciones lingüísticas.</li>
+</ul></li>
+<li>Reescritura inversa
+<ul>
+<li>Sustituye conectores por sus contrarios.</li>
+<li>Modifica relaciones semánticas sin alterar completamente los eventos.</li>
+<li>Evalúa sensibilidad a cambios en las relaciones de la narrativa.</li>
+<li>PSS alto: el modelo es robusto a cambios en conectores y relaciones lingüísticas.</li>
+</ul></li>
+</ul></li>
+<li>Perturbación del orden temporal
+<ul>
+<li>Invierte el orden de las frases de la historia.</li>
+<li>Mantiene eventos pero altera la temporalidad.</li>
+<li>Evalúa dependencia del modelo del orden cronológico.</li>
+<li>PSS alto: el modelo no depende del orden temporal.</li>
+</ul></li>
+<li>Repetición de eventos
+<ul>
+<li>Repite eventos clave varias veces dentro de la historia.</li>
+<li>Evalúa si el modelo sobrepondera frecuencia de eventos.</li>
+<li>PSS alto: el modelo ignora la repetición como señal relevante.</li>
+</ul></li>
+<li>Inserción de ruido irrelevante
+<ul>
+<li>Añade frases irrelevantes que no afectan la narrativa principal.</li>
+<li>Evalúa la capacidad del modelo para filtrar información no útil.</li>
+<li>PSS alto: el modelo es robusto frente a ruido textual.</li>
+</ul></li>
+</ol>
+</section>
+<section id="evaluación-perturbation-sensitivity-score-pss" class="level2" data-number="18.3">
+<h2 data-number="18.3" class="anchored" data-anchor-id="evaluación-perturbation-sensitivity-score-pss"><span class="header-section-number">18.3</span> 4.3. Evaluación: Perturbation Sensitivity Score (PSS)</h2>
+<p>Todas las explicaciones perturbadas se evaluan mediante PSS (Perturbation Sensitivity Score). \1 <span class="math display">\[
+\text{PSS}(x, x') = \cos\left(\mathrm{embedding}(E(x)), \mathrm{embedding}(E(x'))\right)
+\]</span></p>
+<p>Donde. \1- E(x): explicación original - E(x’): explicación perturbada</p>
+<p>La interpretación del PSS es. \1- Valores altos: baja sensibilidad - Valores bajos: alta sensibilidad</p>
+<p>El PSS no mide fidelidad causal, sino estabilidad semántica de las explicaciones en el espacio de embeddings. Debido a que no existe un ground truth explicativo, se interpreta como una aproximación a la consistencia de la explicación.</p>
+</section>
+</section>
+<section id="resultados-de-los-experimentos" class="level1" data-number="19">
+<h1 data-number="19"><span class="header-section-number">19</span> 5. Resultados de los experimentos</h1>
+<p>Los valores PSS muestran una alta estabilidad global de las explicaciones, lo que indica que el modelo genera explicaciones bastante invariantes a cambios en el input, incluso cuando la historia es alterada de forma significativa.</p>
+<ul>
+<li>Figura 1. Sensibilidad de las explicaciones (PSS por perturbación)</li>
+</ul>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="capitulo_files/figure-html/0c379663-1-ScorePSS.png" class="img-fluid figure-img"></p>
+<figcaption>ScorePSS.png</figcaption>
+</figure>
+</div>
+<p>La figura muestra como varía la sensibilidad de las explicaciones frente a diferentes tipos de perturbaciones. No todas las perturbaciones afectan por igual a la estabilidad semántica de las explicaciones.</p>
+<ul>
+<li>Figura 2. PSS agrupado por categorías de perturbación</li>
+</ul>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="capitulo_files/figure-html/0c379663-2-ScorePSSCategory.png" class="img-fluid figure-img"></p>
+<figcaption>ScorePSSCategory.png</figcaption>
+</figure>
+</div>
+<p>Al agrupar las perturbaciones en categorías, se observan patrones más generales. Existen diferencias entre perturbaciones estructurales, semánticas y lingüísticas.</p>
+<section id="análisis-cualitativo" class="level2" data-number="19.1">
+<h2 data-number="19.1" class="anchored" data-anchor-id="análisis-cualitativo"><span class="header-section-number">19.1</span> 5.1. Análisis cualitativo</h2>
+<ol type="1">
+<li><p>El modelo no depende de los nombres de los personajes, ni se ve afectado al cambiar la identidad de estos. Esto sugiere que el razonamiento se basa en representaciones abstractas más que en entidades específicas. <strong>Implicación XAI: buena generalización, pero puede perderse identidad narrativa</strong>.</p></li>
+<li><p>El modelo es robusto a cambios semánticos (cambios de conectores o ruido no alteran mucho la explicación). Aún así, el lenguaje afecta más que la estructura narrativa. <strong>Implicación XAI: mayor sensibilidad a la forma lingüística que a cambios estructurales</strong>.</p></li>
+<li><p>El modelo reconstruye bastante bien la explicación incluso con información incompleta, lo que indica que el modelo no depende de todos los eventos para razonar. <strong>Implicación XAI: falta de fidelidad a la evidencia de la historia completa</strong>.</p></li>
+<li><p>El modelo es sensible a la estructura temporal y narrativa, es decir, la explicación depende del orden de los eventos más que de los eventos. <strong>Implicación XAI: la temporalidad y el orden narrativo son clave para generar las explicaciones.</strong></p></li>
+<li><p>El modelo no ignora completamente la redundancia de la información. <strong>Implicación XAI: hay un sesgo hacia redundancia textual</strong>.</p></li>
+</ol>
+</section>
+</section>
+<section id="conexión-con-xai-clásica" class="level1" data-number="20">
+<h1 data-number="20"><span class="header-section-number">20</span> 6. Conexión con XAI clásica</h1>
+<p>Este proyecto se relaciona con la XAI clásica en tres aspectos. \1 1. Métodos como LIME utilizan perturbaciones del input para aproximar modelos complejos. Aquí las perturbaciones se extienden al nivel narrativo completo.</p>
+<ol start="2" type="1">
+<li><p>En XAI clásica una explicación es más fiable si es estable bajo pequeñas variaciones del input. Este principio se ha traslado a este proyecto en el espacio de explicaciones generadas por LLMs.</p></li>
+<li><p>Métodos como LIME o SHAP explican decisiones de modelos, pero aquí el LLM tiene dos roles: sistema generador y objeto de análisis.</p></li>
+</ol>
+</section>
+<section id="limitaciones" class="level1" data-number="21">
+<h1 data-number="21"><span class="header-section-number">21</span> 7. Limitaciones</h1>
+<p>Este enfoque tiene grandes limitaciones respecto a la XAI clásica. \1 1. Los resultados dependen del modelo utilizado, limitando generalización.</p>
+<ol start="2" type="1">
+<li><p>Las explicaciones pueden no ser consistentes entre ejecuciones.</p></li>
+<li><p>El PSS mide similitud semántica, pero no equivalencia causal.</p></li>
+<li><p>No existe ground truth explicativo: no se puede medir la fidelidad tradicional.</p></li>
+</ol>
+</section>
+<section id="consideraciones-sobre-el-diseño-del-prompt-y-el-formato-de-salida" class="level1" data-number="22">
+<h1 data-number="22"><span class="header-section-number">22</span> 8. Consideraciones sobre el diseño del prompt y el formato de salida</h1>
+<p>Un aspecto clave del diseño del pipeline experimental es el uso de un prompt estructurado con salida en formato JSON, que restringe la generación del modelo a una representación fija de la explicación. Esta decisión no es del todo técnica, sino más bien metodológica, ya que permite controlar la salida del modelo y reducir la variabilidad en diferencias de formato o estilo de redacción.</p>
+<p>Al tener una estructura fija con campos predefinidos (characters, events, causal_relations, narrative_structure), se garantiza que todas las explicaciones sean comparables bajo la misma representación. Esto permite centrarse en la variabilidad semántica, evitando que las diferencias de estilo del texto afecten la evaluación de estabilidad. Como consecuencia, la métrica PSS mide la estabilidad semántica de la información en cada campo de la explicación, y no la variabilidad estructural.</p>
+<p>No obstante, esta decisión implica una limitación: al restringir la salida del modelo, se reduce la expresividad del LLM y pueden no capturarse posibles variaciones en el estilo de la explicación. Sin embargo, se ha considerado que esta restricción es necesaria para poder comparar ejemplos y validar la estabilidad frente a perturbaciones narrativas.</p>
+</section>
+<section id="conclusiones" class="level1" data-number="23">
+<h1 data-number="23"><span class="header-section-number">23</span> 9. Conclusiones</h1>
+<p>Este proyecto se encuentra dentro de un área emergente de la XAI aplicada a LLMs, donde no existe aún un “consenso” sobre como definir o evaluar una explicación. El proyecto explora un problema y muestra que la robustez semántica de las explicaciones no garantiza fidelidad causal.</p>
+<p>A nivel de aprendizaje, el análisis realizado permite entender mejor las limitaciones de los LLMs como sistemas explicativos, así como la importancia de diseñar nuevas métricas para este tipo de modelos. Aunque los resultados no son comparables con los de XAI clásica, este proyecto aporta resultados sobre el comportamiento de las explicaciones generadas y su sensibilidad a diferentes perturbaciones narrativas.</p>
+</section>
+<section id="referencias" class="level1" data-number="24">
+<h1 data-number="24"><span class="header-section-number">24</span> 10. Referencias</h1>
+<ul>
+<li><p>Alvarez-Melis, D., &amp; Jaakkola, T. (2018).<br>
+<em>On the Robustness of Interpretability Methods.</em><br>
+https://doi.org/10.48550/arXiv.1806.08049</p></li>
+<li><p>Jacovi, A., &amp; Goldberg, Y. (2020).<br>
+<em>Towards Faithfully Interpretable NLP Systems: How should we define and evaluate faithfulness?</em><br>
+https://doi.org/10.48550/arXiv.2004.03685</p></li>
+<li><p>Kaggle Dataset: <em>1000 Stories – 100 Genres</em><br>
+Dataset utilizado para las narrativas del proyecto.<br>
+https://www.kaggle.com/datasets/fareedkhan557/1000-stories-100-genres</p></li>
+<li><p>Ribeiro, M. T., Singh, S., &amp; Guestrin, C. (2016).<br>
+<em>“Why Should I Trust You?” Explaining the Predictions of Any Classifier</em><br>
+https://doi.org/10.48550/arXiv.1602.04938</p></li>
+<li><p>Yeh, C. K., Hsieh, C. Y., Suggala, A., Inouye, D. I., &amp; Ravikumar, P. (2019).<br>
+<em>On the (In)fidelity and Sensitivity of Explanations.</em><br>
+https://doi.org/10.48550/arXiv.1901.09392</p></li>
+<li><p>Wen, Q., Wang, J., Nan, Y., He, P., Tandon, R., &amp; Xu, H. (2026). <em>Embedding Perturbation may Better Reflect Intermediate-Step Uncertainty in LLM Reasoning</em><br>
+https://doi.org/10.48550/arXiv.2602.02427</p></li>
+</ul>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    // Ensure there is a toggle, if there isn't float one in the top right
+    if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+      const a = window.document.createElement('a');
+      a.classList.add('top-right');
+      a.classList.add('quarto-color-scheme-toggle');
+      a.href = "";
+      a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+      const i = window.document.createElement("i");
+      i.classList.add('bi');
+      a.appendChild(i);
+      window.document.body.appendChild(a);
+    }
+    setColorSchemeToggle(hasAlternateSentinel())
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copiado");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copiado");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+    const viewSource = window.document.getElementById('quarto-view-source') ||
+                       window.document.getElementById('quarto-code-tools-source');
+    if (viewSource) {
+      const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+      viewSource.addEventListener("click", function(e) {
+        if (sourceUrl) {
+          // rstudio viewer pane
+          if (/\bcapabilities=\b/.test(window.location)) {
+            window.open(sourceUrl);
+          } else {
+            window.location.href = sourceUrl;
+          }
+        } else {
+          const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+          modal.show();
+        }
+        return false;
+      });
+    }
+    function toggleCodeHandler(show) {
+      return function(e) {
+        const detailsSrc = window.document.querySelectorAll(".cell > details > .sourceCode");
+        for (let i=0; i<detailsSrc.length; i++) {
+          const details = detailsSrc[i].parentElement;
+          if (show) {
+            details.open = true;
+          } else {
+            details.removeAttribute("open");
+          }
+        }
+        const cellCodeDivs = window.document.querySelectorAll(".cell > .sourceCode");
+        const fromCls = show ? "hidden" : "unhidden";
+        const toCls = show ? "unhidden" : "hidden";
+        for (let i=0; i<cellCodeDivs.length; i++) {
+          const codeDiv = cellCodeDivs[i];
+          if (codeDiv.classList.contains(fromCls)) {
+            codeDiv.classList.remove(fromCls);
+            codeDiv.classList.add(toCls);
+          } 
+        }
+        return false;
+      }
+    }
+    const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+    if (hideAllCode) {
+      hideAllCode.addEventListener("click", toggleCodeHandler(false));
+    }
+    const showAllCode = window.document.getElementById("quarto-show-all-code");
+    if (showAllCode) {
+      showAllCode.addEventListener("click", toggleCodeHandler(true));
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../../chapters/toxicidad/capitulo.html" class="pagination-link" aria-label="¿Podemos confiar en las explicaciones de los detectores de lenguaje tóxico?">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">¿Podemos confiar en las explicaciones de los detectores de lenguaje tóxico?</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../../chapters/senales_trafico/capitulo.html" class="pagination-link" aria-label="Explicabilidad de redes neuronales para señales de tráfico">
+        <span class="nav-page-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Explicabilidad de redes neuronales para señales de tráfico</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+<footer class="footer"><div class="nav-footer"><div class="nav-footer-center"><div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.dev/belenda/xai_stories_project/blob/main/chapters/tejedor/capitulo.ipynb" class="toc-action"><i class="bi bi-github"></i>Editar esta página</a></li><li><a href="https://github.com/belenda/xai_stories_project/issues/new" class="toc-action"><i class="bi empty"></i>Informar sobre problema</a></li></ul></div></div></div></footer></body></html>

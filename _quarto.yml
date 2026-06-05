@@ -32,18 +32,18 @@ book:
         - chapters/admision_ucm/capitulo.ipynb
         - chapters/inversiones/capitulo.ipynb
         - chapters/rotacion_laboral/capitulo.ipynb
-        - chapters/sueño/capitulo.ipynb
+        - chapters/sueno/capitulo.ipynb
     - part: "Texto e IA generativa"
       chapters:
         - chapters/toxicidad/capitulo.ipynb
         - chapters/tejedor/capitulo.ipynb
     - part: "Visión por computador"
       chapters:
-        - chapters/señales_trafico/capitulo.ipynb
+        - chapters/senales_trafico/capitulo.ipynb
         - chapters/cnn_vae/capitulo.ipynb
     - part: "Sistemas e interfaces"
       chapters:
-        - chapters/dashboard/entregable_explicacion.qmd
+        - chapters/dashboard/capitulo.ipynb
     - acknowledgements.qmd
     - references.qmd
 
