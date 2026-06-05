@@ -8,23 +8,46 @@ book:
   author: "Belén Díaz Agudo y los estudiantes de XAI Curso 2025/26 del máster en IA de la UCM"
   date: today
   date-format: "YYYY"
-  repo-url: https://github.com/belenda/xai-stories
+  repo-url: https://github.com/belenda/xai_stories_project
   repo-actions: [edit, issue]
   sharing: [twitter, linkedin]
   chapters:
     - index.qmd
     - foreword.qmd
-    - part: "Casos de Estudio"
+    - part: "Nuevos métodos y propuestas"
       chapters:
-        - chapters/01-ejemplo.qmd
-        # Añadir aquí los capítulos de cada equipo:
-        # - chapters/02-nombre-capitulo.qmd
-        # - chapters/03-nombre-capitulo.qmd
+        - chapters/lime_ga/capitulo.ipynb
+        - chapters/adversarios_lime_shap/capitulo.ipynb
+    - part: "Imagen médica y señales"
+      chapters:
+        - chapters/alzheimer/capitulo.ipynb
+        - chapters/ecg/capitulo.ipynb
+        - chapters/emociones/capitulo.ipynb
+    - part: "Series temporales"
+      chapters:
+        - chapters/triplek/capitulo.ipynb
+        - chapters/xrl/capitulo.ipynb
+    - part: "Datos tabulares"
+      chapters:
+        - chapters/admision_ucm/capitulo.ipynb
+        - chapters/inversiones/capitulo.ipynb
+        - chapters/rotacion_laboral/capitulo.ipynb
+        - chapters/sueño/capitulo.ipynb
+    - part: "Texto e IA generativa"
+      chapters:
+        - chapters/toxicidad/capitulo.ipynb
+        - chapters/tejedor/capitulo.ipynb
+    - part: "Visión por computador"
+      chapters:
+        - chapters/señales_trafico/capitulo.ipynb
+        - chapters/cnn_vae/capitulo.ipynb
+    - part: "Sistemas e interfaces"
+      chapters:
+        - chapters/dashboard/entregable_explicacion.qmd
     - acknowledgements.qmd
     - references.qmd
 
 bibliography: references.bib
-# csl: apa.csl  # Descomentar si se añade un archivo .csl personalizado
 
 format:
   html:
@@ -43,8 +66,7 @@ format:
     fig-height: 5
 
 execute:
-  freeze: auto
-  eval: false
+  enabled: false
   warning: false
   message: false
 
