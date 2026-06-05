@@ -1,5 +1,4 @@
 /.quarto/
-/docs/
 /_freeze/
 __pycache__/
 *.pyc
@@ -7,3 +6,5 @@ __pycache__/
 .DS_Store
 *.egg-info/
 .env
+
+**/*.quarto_ipynb
