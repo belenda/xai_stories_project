@@ -1,0 +1,331 @@
+# Explicación y exploración de Datasets mediante lenguaje natural y técnicas de Inteligencia Artificial Explicable
+## Autores
+**María Sachez Carrasco**
+
+**David Rivera Martínez**
+
+**Pablo Sánchez Martín**
+
+## Resumen
+Este trabajo aborda la dificultad de interpretar modelos de Machine Learning para usuarios no expertos que no conozcan o no sean capaces de interpretar las métricas y explicaciones ofrecidas por los modelos y sus explicadores correspondientes. Para resolver este problema, se ha desarrollado una interfaz web interactiva que integra un modelo predictivo (escogido entre varios según su rendimiento) con técnicas de Inteligencia Artificial Explicable (XAI) utiliazadas para casos de Regresión y Clasificación en datos tabulares y en casos de Clasificación en imágenes. El enfoque permite a los usuarios interactuar con los datos, evaluar instancias específicas y plantear casos manualmente. Las conclusiones principales indican que la incorporación de explicaciones dinámicas, a pesar de haber utilizado LLMs muy reducidos, ayudan al usuario a entender un dataset y tratar de encontrar los diferentes patrones de decisión.
+
+## Introducción
+En los últimos años, el Machine Learning ha dejado de ser un campo exclusivo de la investigación científica para convertirse en el motor de herramientas cotidianas. Esta rápida expansión ha atraído a una oleada de nuevos usuarios y desarrolladores que buscan aprovechar el potencial de estas herramientas para construir modelos de utilidad local o global, de manera 'casera' o para desarrollarse de forma profesional. Sin embargo, los modelos que mejor rendimiento suelen ofrecer en problemas de alta complejidad son de 'caja negra' o difícilmente explicables o auditables. Aunque la Inteligencia Artificial Explicable ha avanzado con técnicas potentes, hace falta ser conocer de la misma para entender cómo utilizar y cómo interpretar sus datos. Existe una brecha evidente entre la capacidad técnica de los explicadores y la comprensión real del nuevo usuario. Una vía con potencial para solucionar este problema es aprovechar los agentes de IA, herramientas conversacionales con las que la sociedad ya interactúa de forma nativa en su día a día, utilizándolos como intermediarios para traducir la complejidad matemática a explicaciones en lenguaje natural coherentes y accesibles para cualquier usuario. 
+
+Es, por lo tanto, el objetivo de este trabajo democratizar el acceso al entendimiento del Machine Learning. A través de modelos de lenguaje de tamaño reducido (8B de parámetros) y una orquestación agéntica adecuada es posible alcanzar un nivel de razonamiento interesante para comprender un dataset nuevo y explicarlo debidamente. Gracias a la creación de diferentes herramientas a los que un modelo razonador tiene acceso, se generan las explicaciones que un experto en XAI podría entender (explicaciones DiCE, LIME, GradCAM, etc.). Dichas explicaciones son posteriormente explicadas por el 'experto' en XAI, que es un agente LLM capaz de desglosar el contexto recibido y entender sus implicaciones.
+
+Al ser este un proyecto basado en modelos largos de lenguaje (actualmente en auge) la precisión de la herramienta mejorará junto con el estado del arte, pues no se depende de un modelo específico o *fine-tuned*. De esta forma, el proyecto está preparado para aceptar cualquier modelo diferente al escogido por defecto (`llama3:8b`, actualmente) y adaptarse a las necesidades y capacidades de cómputo de cada ejecución. Adicionalmente, al haber orquestado una organización agéntica mediante uso de *tools*, razonadores y críticos, la ampliación de las capacidades del proyecto viene dada de forma simple: sólo debemos ampliar las herramientas XAI a utilizar. 
+
+## Datos
+Los datos a utilizar en cada sesión vienen dados por el usuario. Es él el que propone un nuevo dataset a explicar, que puede ser de los siguientes tipos:  
+
+- Tabular - Clasificación: Donde debemos, según una serie de datos, clasificar en un tipo u otro los diferentes casos.
+- Tabular - Regresión: Donde debemos estimar una cantidad final según los datos disponibles.
+- Imágenes - Clasificación: Donde estimaremos si en una imagen aparece una figura específica que coincida con una de las clases objetivo.
+
+De esta forma, todos los datasets presentados por el usuario sufren el mismo preprocesamiento según su tipo, como se describe a continuación.
+
+### Tabular
+En primer lugar, se descartan por completo todas aquellas filas del archivo que contengan algún valor nulo o vacío, para evitar cualquier problemática que puedan generar. 
+
+Posteriormente el sistema realiza una comprobación en el almacenamiento local para verificar si ya existe un archivo de metadatos guardado para este conjunto de datos en particular. Si no se encuentra este registro previo, se invoca a un módulo automatizado que analiza el archivo y genera una descripción semántica detallada de las variables, además de proporcionar métricas de media y desviación típica de las variables. Dicho módulo se ha implementado a través de IA agéntica. Este resultado se almacena en el disco para servir como memoria caché en futuras ejecuciones, lo que evita que se tenga que repetir el análisis semántico cada vez que se use el mismo dataset.
+
+El siguiente paso consiste en la aplicación de One-Hot Encoding para las variables categóricas, necesario para modelos de ML.
+
+A continuación, separamos el conjunto de datos en *train* y *test* en una relación 80:20, con la que entreremos y valideremos los diferntes modelos escogidos. Importante destacar que se realiza estratificación de los datos, para evitar cualquier sesgo en el aprendizaje.
+
+Finalmente, el preprocesamiento concluye con la estandarización y normalización de los datos.
+
+### Imágenes 
+Se realiza un *Label Encoding* de la variable objetivo para poder procesarlas. 
+
+De forma idéntica al preprocesamiento de datos tabulares, se ejecuta la seperación de datos para entrenamiento y validación del modelo, manteniendo la estratificación mencionada.
+
+Posteriormente, para cada dirección de archivo, el sistema abre la imagen del disco y la convierte de manera estricta a RBG para garantizar la homogeneidad de los datos. Cada imagen se redimensiona a una resolución estándar fija de 128 por 128 píxeles, eliminando las discrepancias de tamaño que pudieran existir en las fotos originales. Finalmente, los datos visuales se transforman y se normalizan dividiendo el valor de cada píxel entre 255, lo que escala la intensidad del color a un valor entre 0 y 1. Este procedimiento se aplica de forma idéntica para generar tanto la matriz de características de entrenamiento como la de pruebas.
+
+Para concluir, el sistema recopila toda la información técnica relevante en un objeto de metadatos que se serializa en formato de texto plano. Este registro documenta formalmente que el tipo de datos corresponde a imágenes:  
+
+- Clases encontradas
+- Dimensiones finales de las imágenes incluyendo el canal de color triple
+- Volumen exacto de muestras disponibles en cada subconjunto
+
+## Modelos
+### Modelos utilizados para datos tabulares
+Para tareas de clasificación y regresión sobre datos tabulares se han escogido y utilizado modelos clásicos de Scikit-Learn por su equilibrio entre rendimiento, velocidad de entrenamiento y compatibilidad con herramientas de Inteligencia Artificial Explicable.  
+
+#### Random Forest  
+Tanto en clasificación (RandomForestClassifier) como en regresión (RandomForestRegressor) se ha utilizado Random Forest basados en conjuntos de árboles de decisión.  
+Estos modelos se caracterizan por:  
+
+- Buena capacidad de generalización
+- Robustez frente a ruido y overfitting
+- Capacidad para capturar relaciones no lineales
+- Compatibilidad elevada con explicadores como SHAP o LIME
+
+#### Gradient Boosting
+Los modelos GradientBoostingClassifier y GradientBoostingRegressor se han añadido por su capacidad para construir modelos secuenciales donde cada árbol corrige los errores del anterior.  
+Sus principales ventajas son:
+
+- Alto rendimiento predictivo
+- Capacidad para modelar relaciones complejas
+- Buen comportamiento en datasets medianos y estructurados
+
+#### Regresión Logística y Regresión Lineal
+
+LogisticRegression se ha utilizado para problemas de clasificación, mientras que LinearRegression se ha utilizado para problemas de regresión.
+Sus principales ventajas son:
+
+- Alta interpretabilidad
+- Bajo coste computacional
+- Buen comportamiento en datasets linealmente separables
+- Facilidad para explicar matemáticamente las predicciones
+
+#### Support Vector Machines (SVM)
+Se ha utilizado modelos SVC (Support Vector Classification) y SVR (Support Vector Regression).
+Sus principales ventajas son:  
+
+- Buena capacidad de separación en espacios no lineales
+- Rendimiento competitivo en datasets de tamaño medio
+- Robustez frente a dimensionalidad elevada
+
+### Modelos utilizados para clasificación de imágenes
+Para afrontar problemas de clasificación de imágenes se han utilizado modelos de Deep Learning mediante Transfer Learning empleando arquitecturas preentrenadas sobre ImageNet.  
+Las imágenes se han procesado con un tamaño fijo de 128x128 píxeles y tres canales RGB.   
+
+#### MobileNetV2
+Sus principales ventajas son:
+
+- Bajo coste computacional
+- Buena precisión en dispositivos con recursos limitados
+- Arquitectura optimizada para inferencia rápida
+
+#### ResNet50
+ResNet50 incorpora conexiones residuales que permiten entrenar redes profundas evitando el problema del desvanecimiento del gradiente.
+Sus principales ventajas son:
+
+- Excelente rendimiento en clasificación visual
+- Gran capacidad de extracción de características complejas
+- Robustez en tareas de visión artificial
+
+#### VGG16
+Sus principales ventajas son:
+
+- Arquitectura sencilla y fácilmente interpretable
+- Buen comportamiento como extractor de características
+- Compatibilidad elevada con técnicas XAI visuales como GradCAM
+
+#### EfficientNetB0
+EfficientNetB0 utiliza un escalado equilibrado entre profundidad, anchura y resolución.
+Sus principales ventajas son:
+
+- Excelente relación precisión/coste computacional
+- Menor número de parámetros respecto a otras arquitecturas profundas
+- Buen rendimiento general en clasificación de imágenes
+
+## Métricas de rendimiento
+
+La evaluación de los modelos se realiza automáticamente sobre el conjunto de test generado durante la fase de preprocesamiento.
+
+### Métricas para clasificación
+
+Para problemas de clasificación se calcularon las siguientes métricas:
+
+- **Accuracy:** proporción de predicciones correctas sobre el total
+- **F1-Score:** media armónica entre precisión y recall, ponderada según el número de muestras por clase
+- **Precisión:** proporción de verdaderos positivos con respecto a todas las predicciones positivas
+- **Recall:** proporción de verdaderos positivos detectados con respecto al total real
+
+### Métricas para regresión
+
+En tareas de regresión se emplearon:
+
+- **Error Cuadrático Medio (MSE):** mide la diferencia promedio cuadrática entre valores reales y predichos
+- **Coeficiente de determinación ($R^2$):** evalúa la proporción de varianza explicada por el modelo
+
+## Persistencia y reutilización de modelos
+
+Con el objetivo de optimizar tiempos de ejecución, el sistema implementa un mecanismo de persistencia automática de modelos entrenados.
+
+Los modelos tabulares se almacenan utilizando skops, mientras que los modelos de Deep Learning se serializan en formato .keras. También se guarda un archivo JSON de metadatos que registra el tipo de tarea, modelo entrenado y archivo asociado al modelo.
+
+Gracias a este mecanismo, si un dataset ya ha sido procesado anteriormente, el sistema puede reutilizar directamente el modelo entrenado sin necesidad de repetir el entrenamiento completo.
+
+## Explicaciones
+### Arquitectura de componentes del sistema
+Para este proyecto se han utilizado los siguientes componentes:
+
+- Sistema agéntico en local:
+    - Ollama a través de Langchain
+    - Modelo llama3:8b
+- Modelos de Machine Learning de Sklearn:
+    - Random Forest
+    - Gradient Boosting
+    - Logistic Regression
+    - Linear Regression
+    - SVC/SVR
+- Modelos de Deep Learning de Keras:
+    - MobileNetV2
+    - ResNet50
+    - VGG16
+    - EfficientNetB0
+    - SimpleCNN
+- Herramientas de xAI:
+    - SHAP
+    - LIME
+    - Alibi: Anchors
+    - DiCE: Contrafactuales
+    - MMD_Critic: Prototipos
+    - GradCam
+    - Saliency Maps
+    - Occlusion Sensivity
+    - Integrated Gradientes
+    - Lime_Image
+
+**Arquitectura de carpetas del proyecto:** el proyecto sigue una distribución de sus archivos en las siguientes carpetas:
+
+- **agents:** donde se encuentran las implementaciones de los diferentes agentes utilizados durante el proyecto.
+- **datasets:** donde se encuentran los diferentes conjuntos de datos utilizados.
+- **static:**  que contiene el archivo index.html con el que se genera la página web donde se ejecuta el proyecto.
+- **tools:** que tiene dos clases donde se encuentran todas las tools desarrolladas durante  el proyecto.
+- **utils:** utilizado para crear archivos de utilidad general, como los modelos, las funciones para preprocesamiento y demás.
+- **archivo api.py:** que realiza la comunicación con index.html para generar la interacción entre el código python generado y la página web. Este es el punto de entrada al proyecto.
+- **archivo config.py:** que tiene configuración básica sobre el proyecto.
+
+**Otros componentes:** Para mantener la información de la instancia entre preguntas, se crea una clase _XAIInstanceCaptureCallback_ que hereda de _BaseCallbackHandler_, que se llama cuando el agente accede a una tool. Si entre los parámetros de la llamada hay una instancia, ésta se almacena. El agente está envuelto en otra clase que, al invocarlo, verifica si hay una instancia previa. Si ese es el caso, se le inyecta en el prompt.
+
+### Descripción de componentes de la implementación
+En esta sección se describe el pipeline completo del proyecto, viendo dónde se invocan cada uno de los componentes mencionados anteriormente, además de una descripción detallada de cada uno de ellos.
+
+**Selección de Dataset:** En un primer momento se le presenta al usuario un menú donde poder seleccionar el dataset sobre el que quiera recibir explicaciones. Este puede estar en formato .csv o .zip si se tratan de imágenes. En el segundo caso la carpeta extraída debe seguir el siguiente formato: **raíz.zip -> raíz/subcarpetas_clases**, de tal forma que cada una de las subcarpetas generadas sean cada una de las clases a clasificar por el modelo.
+**Selección de Variable Objetivo (Sólo para tabulares):** En el mismo menú mencionado anteriormente también se le muestra al usuario un dropdown con el que poder escoger cuál será la variable objetivo de su modelo. En caso de tratarse de un dataset de imágenes, se asume que se habla de un problema de clasificación. 
+
+**Carga de la sesión:** Tras confirmar la elección y pulsar el botón correspondiente (Inicializar Pipeline) al usuario se le presenta una escena de carga donde sucederán diferentes acciones:
+
+- **Agente Perfilador de Metadatos (sólo tabulares):** Para los datasets tabulares se ha ideado un agente capaz de perfilar y comprender las diferentes variables que hay dentro del conjunto de datos, además de dar una descripción general. Gracias a los agentes LLM es posible entender el problema dado sin que el usuario tenga que especificarlo, aprovechándonos de la gran capacidad lógica que tienen este tipo de modelos y exprimiéndola para entender el problema al que nos enfrentamos. De esta forma, da igual cuál sea el dataset introducido, el agente entenderá cuál es el objetivo del conjunto de datos. Sin embargo, esto depende directamente de cómo se nombren las variables; los nombres deben ser coherentes y no deben estar codificados de ninguna forma.
+Esta acción no está disponible para datasets de imágenes porque siempre se entiende que es un problema de clasificación. Sin embargo, sí que se generan metadatos igualmente, aunque se hace a través de código convencional.
+Adicionalmente, esta acción no se realiza si ya ha sido realizada previamente para un dataset con el mismo nombre. Se guardan estos metadatos en la raíz del dataset y se comprueba si existe un fichero que contengan dichos datos. Esto se hace con el objetivo de evitar hacer una llamada a un agente cada vez que se quiera utilizar el mismo conjunto de datos; ahorrando tokens y reduciendo la latencia del sistema.
+- **Preprocesamiento de los datos:** Independientemente del tipo de dataset escogido es importante realizar un preprocesado de los datos. En el caso de las imágenes: se normalizan a un tamaño estandarizado (128x128) y se utilizan en formato RGB. En caso de datos tabulares: se eliminan los valores nulos, se hace OneHotEncoding de las variables categóricas y se normalizan las numéricas.
+Este apartado se realiza siempre.
+- **Recomendación de modelos:** Dados los metadatos del conjunto de datos generados anteriormente junto a unas filas de ejemplo del mismo, se llama a un **agente recomendador de modelos** que es capaz de escoger entre una lista designada de modelos qué dos modelos podrían dar buenos resultados dado el tipo de problema al que nos enfrentamos. 
+Tras validar que estos modelos existen entre las opciones dadas, se procede al entrenamiento de los mismos.
+- **Entrenamiento de modelos:** Una vez validados los modelos escogidos por el agente, estos deben ser entrenados según los parámetros escogidos. 
+Una vez concluido el entrenamiento, los modelos se guardan para no tener que ser entrenados nuevamente si se realiza una nueva sesión con el mismo conjunto de datos. De esta forma este apartado y el inmediatamente anterior sólo son ejecutados si es la primera vez que aparece un dataset concreto.
+- **Explorador del conjunto de datos:** Tras la configuración general del modelo, ahora es el turno de configurar la interfaz de usuario. Durante el desarrollo, se ha diseñado e implementado una interfaz donde poder visualizar el dataset, así como todas sus filas con la variable objetivo **real** y la **predicha** por el modelo. Cada una de estas filas contiene un botón **Explicar**, que copia la referencia a la instancia en la ventana de chat para poder hacer preguntas específicas al modelo sobre esa instancia. 
+También es en este momento cuando se debe configurar la otra pestaña presente en la interfaz de usuario: **Nuevo Caso**, donde el usuario puede configurar un nuevo caso no contemplado en el dataset  y que el modelo realice la predicción para el mismo.
+Este apartado debe realizarse en todas las configuraciones de sesiones.
+
+**Chat:** A partir de este punto del pipeline es cuando el usuario ya puede interactuar libremente con el **agente explicador** generado para responder a sus dudas acerca del conjunto de datos. Puede interactuar con él a través del botón Explicar mencionado anteriormente o directamente lanzando sus preguntas al chat. El modelo hará su mejor esfuerzo por responder correctamente a la pregunta, además de añadiendo gráficos fácilmente interpretables por el usuario para que pueda entender las preguntas planteadas y mejorar su comprensión del conjunto de datos. 
+Esta parte del pipeline está construída por dos agentes:
+
+- **Agente de Herramientas:** Este es el agente que escoge cuál es la herramienta a utilizar de entre las disponibles para resolver el problema. Las herramientas correspondientes se elegirán en función del problema, dependiendo de si es un problema tabular o de imágenes, compartiendo las de greetings y out_of_scope, que ayudan al modelo a responder a preguntas que no estén directamente relacionadas con el conocimiento del agente.
+- **Agente Crítico-Explicador:** Valida la herramienta escogida por el agente anterior y decide si los datos devueltos tras su ejecución son suficientes para responder a la pregunta original del usuario. En caso de que no, se escoge otra herramienta y se añade su resultado al contexto general. Cuando el contexto es suficiente, este agente vuelca en lenguaje natural una explicación para la pregunta del usuario, que posteriormente es recibida por el mismo. 
+
+También se ha implementado el componente de memoria anteriormente mencionado que ayuda a mantener en el contexto cuál es la última instancia local sobre la que se ha preguntado, evitando tener que mencionarla cada vez en el prompt del usuario.
+
+### Demostración de uso
+A continuación se adjuntan hasta 4 ejemplos de diferentes interacciones típicas, habiendo seguido el *pipeline* anteriormente detallado. Estas interacciones son las resultantes de *prompts* que hacen que el agente acceda a utilizar herramientas de XAI para poder responder a las preguntas o inquietudes del usuario.
+
+#### Ejemplo 1. El modelo predice correctamente la clase (1) para una instancia concreta
+
+```{python}
+import matplotlib.pyplot as plt
+import matplotlib.image as mpimg
+
+def show_image(img_name):
+    img = mpimg.imread(f"images/{img_name}.png")
+    plt.figure(figsize=(12, 7))
+    plt.imshow(img)
+    plt.axis('off')
+    plt.show()
+
+show_image("1")
+```
+
+Ejemplo 1. El modelo predice correctamente la clase (1) para una instancia concreta  
+
+```{python}
+show_image("2")
+```
+Ejemplo 1. Llamada a la herramienta correspondiente métodos de explicación local 
+
+**Información devuelta tras llamar a la herramienta**  
+_{"shap": {"tipo_dataset": "tabular", "base_value_promedio_dataset": 0.3731, "prediccion_final_modelo": 0.88, "top_5_variables_impacto": {"bac": 0.4985094333436396, "n_drinks": 0.10080575098716064, "weight_kg": -0.04756011464649577, "gender": -0.03449046595582091, "age": -0.024377096525498968}, "plot_path": "plots\\shap_local_waterfall_190015fd.png"}, "lime": {"tipo_dataset": "tabular", "prediccion_modelo": 0.88, "top_5_variables_impacto": {"-0.21 < bac <= 0.55": 0.1646, "n_drinks > 0.86": 0.0998, "weight_kg > 0.67": -0.035, "age > 0.78": 0.0184, "-0.00 < stomach_content <= 1.28": 0.0092}, "plot_path": "plots\\lime_local_49769d54.png"}, "anchor": {"prediccion_modelo": 0.88, "reglas_ancla": ["bac > -0.21", "drink_duration_h > 0.49", "n_drinks > 0.86", "stomach_content > -1.28", "age > 0.78", "weight_kg > 0.67"], "precision": 0.8935, "cobertura": 0.0041}}_  
+
+#### Ejemplo 2. El modelo predice correctamente la clase (0) para una instancia concreta
+
+```{python}
+show_image("3")
+```
+
+Ejemplo 2. El modelo predice correctamente la clase (0) para una instancia concreta
+
+```{python}
+show_image("4")
+```
+Ejemplo 2. Llamada a la herramienta correspondiente (métodos de explicación local) 
+
+**Información devuelta tras llamar a la herramienta**  
+_{"shap": {"tipo_dataset": "tabular", "base_value_promedio_dataset": 0.3731, "prediccion_final_modelo": 0.08, "top_5_variables_impacto": {"bac": -0.31946260452238245, "n_drinks": 0.09598096764526115, "weight_kg": -0.042907225284873333, "gender": -0.027536709002630107, "drink_duration_h": 0.02238192026868897}, "plot_path": "plots\\shap_local_waterfall_8f4e997f.png"}, "lime": {"tipo_dataset": "tabular", "prediccion_modelo": 0.08, "top_5_variables_impacto": {"stomach_content > 1.28": -0.2193, "-0.21 < bac <= 0.55": 0.1632, "n_drinks > 0.86": 0.1187, "weight_kg > 0.67": -0.0354, "age > 0.78": -0.027}, "plot_path": "plots\\lime_local_516e4e02.png"}, "anchor": {"prediccion_modelo": 0.08, "reglas_ancla": ["bac <= 0.55", "weight_kg > 0.67", "stomach_content > -0.00", "n_drinks > 0.86", "drink_duration_h > 0.49"], "precision": 0.9577, "cobertura": 0.0029}}_  
+
+#### Ejemplo 3. El modelo explica cómo funciona el modelo en general y cuáles son las variables clave
+
+```{python}
+show_image("5")
+```
+Ejemplo 3. El modelo explica cómo funciona el modelo en general y cuáles son las variables clave
+
+```{python}
+show_image("6")
+```
+Ejemplo 3. Llamada a la herramienta correspondiente (métodos de explicación global)  
+
+**Información devuelta tras llamar a la herramienta**  
+_{"analisis": "Top 5 variables más importantes a nivel global", "base_value_promedio_dataset": 0.3731, "variables": {"bac": {"importancia_media_absoluta": 0.365, "direccion_impacto": "Positivo (A mayor valor de la variable, mayor es la predicción)"}, "n_drinks": {"importancia_media_absoluta": 0.0602, "direccion_impacto": "Positivo (A mayor valor de la variable, mayor es la predicción)"}, "gender": {"importancia_media_absoluta": 0.0345, "direccion_impacto": "Negativo (A mayor valor de la variable, menor es la predicción)"}, "weight_kg": {"importancia_media_absoluta": 0.0263, "direccion_impacto": "Negativo (A mayor valor de la variable, menor es la predicción)"}, "drink_duration_h": {"importancia_media_absoluta": 0.0209, "direccion_impacto": "Positivo (A mayor valor de la variable, mayor es la predicción)"}}, "plot_path": "plots\\shap_global_bar_de2ed7df.png"}_  
+
+
+#### Ejemplo 4. El modelo explica cómo cambiar las variables de una instancia con el objetivo de cambiar la predicción final  
+
+```{python}
+def show_image_jpeg(img_name):
+    img = mpimg.imread(f"images/{img_name}.jpeg")
+    plt.figure(figsize=(12, 7))
+    plt.imshow(img)
+    plt.axis('off')
+    plt.show()
+
+show_image_jpeg("7")
+```
+Ejemplo 4. El modelo explica cómo cambiar las variables de una instancia con el objetivo de cambiar la predicción final
+
+```{python}
+show_image_jpeg("8")
+```
+Ejemplo 4. Llamada a la herramienta correspondiente (generación de contraejemplos) 
+
+## Conclusiones
+### ¿Qué se ha aprendido?
+Durante el desarrollo de este proyecto se han adquirido conocimientos tanto teóricos como prácticos sobre los sistemas agénticos con LLMs, así como sobre diversas técnicas de Inteligencia Artificial explicable.  
+En primer lugar, se ha aprendido a cómo diseñar e implementar una arquitectura compuesta por múltiples agentes especializados (agente que escoge la tool correspondiente, agente crítico capaz de razonar, agente descriptivo 
+del dataset y agente recomendador de modelos). Esto ha permitido comprender mejor cómo coordinar agentes basados en LLMs que desempeñan tareas distintas con el objetivo de solucionar problemas más complejos de manera modular. 
+Adicionalmente, la orquestación de agentes de diferentes capacidades nos ha hecho entender las capacidades y características que tienen cada uno de ellos dependiendo meramente de su system_prompt. El uso de esquemas concretos de respuesta y las tareas de Prompt Engineering realizadas realmente han supuesto un cambio sustancial en la calidad del proyecto, haciéndonos adquirir mayor destreza en estos campos.  
+También se han adquirido conocimientos sobre la automatización del tratamiento y análisis de datasets. Se ha trabajado en el preprocesamiento de los datos de entrada y en la extracción de metadatos relevantes, que depende del tipo de dataset propuesto.  
+Otro aprendizaje a destacar ha sido la integración entre modelos tradicionales de Machine Learning (Random Forest, Gradient Boosting, etc.) y LLMs actuales. Se ha podido comprobar cómo un LLM puede explicar, tras proporcionarle información fiable extraída de las herramientas de Inteligencia Artificial explicable, tanto el comportamiento general de un modelo como las predicciones realizadas sobre instancias concretas, mejorando así la interpretabilidad de cara al usuario final.  
+Además, el proyecto ha permitido profundizar en distintas técnicas y herramientas de Inteligencia Artificial Explicable, comprendiendo mejor la importancia de la interpretabilidad en este tipo de sistemas. Se ha observado cómo estas técnicas permiten justificar las decisiones tomadas por modelos de aprendizaje automático.  
+Por otra parte, se ha puesto en práctica la implementación del flujo completo de una aplicación para usuarios finales: carga y procesamiento de datos, selección de modelos, entrenamiento, generación de explicaciones, interacción con agentes y construcción de una interfaz conversacional interactiva.  
+Por último, se han podido comprobar las limitaciones de los LLMs actuales, especialmente en la fiabilidad de las respuestas, la interpretación de datos complejos y la necesidad de validar las explicaciones generadas automáticamente.  
+
+### Principales problemas encontrados
+Una de las principales limitaciones del proyecto han sido las alucinaciones del agente selector de la tool.  
+En un primer momento, el modelo se inventaba los datos de entrada de las instancias pedidas para las tools de explicabilidad, proporcionando información sin sentido.  
+Además, el modelo tendía a entrar en un bucle en el que nunca terminaba su respuesta, llamando continuamente a la misma herramienta sin terminar su ejecución hasta alcanzar el time limit, dando fallo en las explicaciones.  
+Para suplirlo, se ha creado un envoltorio del agente para guardar la instancia anterior y se ha implementado un agente crítico, mejorando así estas alucinaciones.  
+
+### Limitaciones del sistema desarrollado
+Los modelos pequeños (8B o menos) son difíciles de manejar en cuanto a su fiabilidad, dando lugar a respuestas erróneas o saltándose normas impuestas en su system prompt por diferentes motivos (lost-in-the-middle entre ellos). Trabajar con este tipo de modelos requiere un esfuerzo y trabajo de pulido realmente importante, además de disponer de una GPU suficientemente grande para poder alojarlos. Esto hace que existan grandes limitaciones temporales al trabajar de forma ‘casera’ con estos modelos, ya que la mayoría de equipos de trabajo con los se contaban no eran tan potentes como sería deseable para el desarrollo de aplicaciones en estos contextos.
+
+### Posibles mejoras y ampliaciones
+- Añadir más formatos soportados además de .csv para procesar datasets más diversos.
+- Añadir datasets de texto con explicadores específicos.
+- Parametrización de los modelos recomendados por el agente: Creando una nueva pestaña donde generar modelos que puedan mejorar las predicciones de los anteriores gracias a las explicaciones dadas por el agente de IA explicable.
+- (En relación con el anterior punto) Agente afinador de modelos: Dados los datos de performance del modelo, crear un agente que pueda sugerir cambios de parámetros o de modelo.
+- Añadir pestaña “Nuevo Caso” para datasets de imágenes.

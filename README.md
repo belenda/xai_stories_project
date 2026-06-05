@@ -14,10 +14,9 @@ git add .
 git commit -m "historia de XAI"
 git push origin main
 ```
-### Activar GitHub Pages
-1. Ir a **Settings > Pages** en el repositorio de GitHub.
-2. En **Source**, seleccionar **GitHub Actions**.
-3. El workflow se ejecutará automáticamente con cada push a `main`.
+Activar GitHub Pages en el repositorio de GitHub.
+En **Source**, seleccionar **GitHub Actions**.
+El workflow se ejecutará automáticamente con cada push a `main`.
 
 ### Añadir capítulos de estudiantes
 ```bash
